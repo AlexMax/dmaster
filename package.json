@@ -1,0 +1,6 @@
+{
+	"name": "dmaster",
+	"devDependencies" : {
+		"mocha" : "*"
+	}
+}
