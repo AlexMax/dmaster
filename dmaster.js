@@ -8,11 +8,33 @@ var master_port = 15300;
 // == END CONFIG ==
 
 var dgram = require('dgram');
+var sqlite3 = require('sqlite3').verbose();
 var huffman = require('./huffman.js');
 var zan = require('./zandronum.js');
 
 var socket = dgram.createSocket('udp4');
+var db = new sqlite3.Database(':memory:');
 var huf = huffman.createHuffman(zan.huffmanFreqs);
+
+db.on('open', function() {
+	this.exec(
+		'PRAGMA foreign_keys = ON;' +
+		'CREATE TABLE servers(' +
+			'id INTEGER PRIMARY KEY AUTOINCREMENT, address TEXT, port INT,' +
+			'maxplayers INT, maxclients INT, password INT, iwad TEXT,' +
+			'map TEXT, gametype TEXT, name TEXT, updated INT,' +
+			'UNIQUE (address, port) ON CONFLICT IGNORE' +
+		');' +
+		'CREATE TABLE players(' +
+			'server_id INT, ping INT, score INT, team INT, spec INT,' +
+			'name TEXT, FOREIGN KEY(server_id) REFERENCES servers(id)' +
+		');' +
+		'CREATE TABLE pwads(' +
+			'server_id INT, pwad TEXT,' +
+			'FOREIGN KEY(server_id) REFERENCES servers(id)' +
+		');'
+	);
+});
 
 function send_challenge(socket) {
 	var challenge = huf.encode(Buffer.concat([zan.LAUNCHER_MASTER_CHALLENGE, zan.MASTER_SERVER_VERSION]));
@@ -98,6 +120,26 @@ socket.on('message', function(msg, rinfo) {
 		break;
 	case zan.MSC_BEGINSERVERLISTPART:
 		var serverList = unmarshallServerList(data.slice(4));
+		var servers = serverList.servers;
+		var stmt = 'INSERT INTO servers (address, port) VALUES (?, ?);';
+
+		for (var i = 0;i < servers.length;i++) {
+			var address = servers[i].address;
+			for (var j = 0;j < servers[i].ports.length;j++) {
+				var port = servers[i].ports[j];
+				db.run(stmt, address, port, function(error) {
+					if (error) {
+						throw new Error(error);
+					}
+				});
+			}
+		}
+
+		db.all('SELECT COUNT(*) FROM servers;', function(err, rows) {
+			console.log(err);
+			console.log(rows);
+		});
+
 		break;
 	default:
 		throw new Error('unrecognized response ' + flag + '.');

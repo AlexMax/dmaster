@@ -1,5 +1,8 @@
 {
 	"name": "dmaster",
+	"dependencies": {
+		"sqlite3": "*"
+	},
 	"devDependencies" : {
 		"mocha" : "*"
 	}
