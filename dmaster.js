@@ -37,7 +37,7 @@ function unmarshallServerList(data) {
 	}
 
 	// Parse out servers
-	var servers = {};
+	var servers = [];
 	var marker = 2;
 	var serverCount = data.readUInt8(marker);
 	while (serverCount !== 0) {
@@ -50,9 +50,11 @@ function unmarshallServerList(data) {
 			ports.push(data.readUInt16LE(marker + 5 + (i * 2)));
 		}
 
-		// Store server
-		var ip = [ip1, ip2, ip3, ip4].join('.');
-		servers[ip] = ports;
+		// Add server
+		servers.push({
+			'address': [ip1, ip2, ip3, ip4].join('.'),
+			'ports': ports
+		});
 
 		// Increment read marker
 		marker += 1 + 4 + serverCount * 2;
@@ -96,7 +98,6 @@ socket.on('message', function(msg, rinfo) {
 		break;
 	case zan.MSC_BEGINSERVERLISTPART:
 		var serverList = unmarshallServerList(data.slice(4));
-		console.log(serverList);
 		break;
 	default:
 		throw new Error('unrecognized response ' + flag + '.');
