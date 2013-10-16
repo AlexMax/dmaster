@@ -1,3 +1,6 @@
+var BufferList = require('bl');
+var printf = require('printf');
+
 var Huffman = function(freq) {
 	if (!(this instanceof arguments.callee)) {
 		throw new Error("Constructor called as a function");
@@ -89,14 +92,40 @@ Huffman.prototype.encode = function(data) {
 	return encoded;
 };
 Huffman.prototype.decode = function(data) {
-	if (data.readUInt8(0) === 0xff) {
-		// Data does not need to be decoded.
+	var padding = data.readUInt8(0);
+
+	// If the padding bit is set to 0xff, no decoding is necessary.
+	if (padding === 0xff) {
 		decoded = new Buffer(data.length - 1);
 		data.copy(decoded, 0, 1);
 		return decoded;
 	}
 
-	throw new Error('Huffman decoding not implemented yet.');
+	// Convert ascii string into binary string.
+	var bitString = '';
+	for (var i = 1;i < data.length;i++) {
+		bitString += printf('%08b', data[i]).split('').reverse().join('');
+	}
+
+	// Remove padding bits from the end.
+	var bitString = bitString.substring(0, bitString.length - padding);
+
+	// Repeatedly traverse the huffman tree turning the huffman code
+	// into the original byte.
+	var decoded = new BufferList();
+	var node = this.tree;
+	for (var i = 0;i < bitString.length;i++) {
+		var bit = bitString.charAt(i);
+		if (bit in node) {
+			node = node[bit];
+		} else {
+			decoded.append(new Buffer([node.asc]));
+			node = this.tree[bit];
+		}
+	}
+	decoded.append(new Buffer([node.asc]));
+
+	return decoded.slice();
 };
 
 exports.Huffman = Huffman;

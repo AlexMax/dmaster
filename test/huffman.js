@@ -43,4 +43,12 @@ describe('Huffman', function() {
 			assert.equal(test.toString('hex'), encoded.toString('hex'));
 		});
 	});
+	describe('Huffman.decode()', function() {
+		it('should be able to huffman-decode the Zandronum master challenge.', function() {
+			var h = new huffman.Huffman(zan.huffmanFreqs);
+			var decoded = h.decode(new Buffer([0x06, 0x68, 0x12, 0xf1, 0x52, 0x27, 0x01]));
+			var test = Buffer.concat([zan.LAUNCHER_MASTER_CHALLENGE, zan.MASTER_SERVER_VERSION]);
+			assert.equal('7c5d56000200', decoded.toString('hex'));
+		});
+	});
 });

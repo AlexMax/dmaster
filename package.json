@@ -1,7 +1,9 @@
 {
 	"name": "dmaster",
 	"dependencies": {
-		"sqlite3": "*"
+		"bl": "0.5.0",
+		"printf": "0.1.2",
+		"sqlite3": "2.1.17"
 	},
 	"devDependencies" : {
 		"mocha" : "*"
