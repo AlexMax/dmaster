@@ -2,6 +2,7 @@
 	"name": "dmaster",
 	"dependencies": {
 		"bl": "0.5.0",
+		"express": "3.4.x",
 		"printf": "0.1.2",
 		"sqlite3": "2.1.17"
 	},

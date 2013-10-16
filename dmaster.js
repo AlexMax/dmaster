@@ -1,6 +1,7 @@
 // == START CONFIG ==
 
-var dmaster_port = 10700;
+var dmaster_dgram_port = 10700;
+var dmaster_web_port = 8080;
 
 var master_address = 'master.zandronum.com';
 var master_port = 15300;
@@ -8,33 +9,13 @@ var master_port = 15300;
 // == END CONFIG ==
 
 var dgram = require('dgram');
-var sqlite3 = require('sqlite3').verbose();
+var db = require('./db.js');
 var huffman = require('./huffman.js');
+var webapp = require('./webapp.js');
 var zan = require('./zandronum.js');
 
 var socket = dgram.createSocket('udp4');
-var db = new sqlite3.Database(':memory:');
 var huf = new huffman.Huffman(zan.huffmanFreqs);
-
-db.on('open', function() {
-	this.exec(
-		'PRAGMA foreign_keys = ON;' +
-		'CREATE TABLE servers(' +
-			'id INTEGER PRIMARY KEY AUTOINCREMENT, address TEXT, port INT,' +
-			'maxplayers INT, maxclients INT, password INT, iwad TEXT,' +
-			'map TEXT, gametype TEXT, name TEXT, updated INT,' +
-			'UNIQUE (address, port) ON CONFLICT IGNORE' +
-		');' +
-		'CREATE TABLE players(' +
-			'server_id INT, ping INT, score INT, team INT, spec INT,' +
-			'name TEXT, FOREIGN KEY(server_id) REFERENCES servers(id)' +
-		');' +
-		'CREATE TABLE pwads(' +
-			'server_id INT, pwad TEXT,' +
-			'FOREIGN KEY(server_id) REFERENCES servers(id)' +
-		');'
-	);
-});
 
 function send_challenge(socket) {
 	var challenge = huf.encode(Buffer.concat([zan.LAUNCHER_MASTER_CHALLENGE, zan.MASTER_SERVER_VERSION]));
@@ -144,9 +125,11 @@ socket.on('message', function(msg, rinfo) {
 
 socket.on('listening', function() {
 	var address = this.address();
-	console.log('dmaster listening on ' + address.address + ':' + address.port + '.');
+	console.log('dgram listening on ' + address.address + ':' + address.port + '.');
 
 	setInterval(send_challenge, 15000, this);
 });
 
-socket.bind(dmaster_port);
+socket.bind(dmaster_dgram_port);
+
+webapp.listen(dmaster_web_port);
