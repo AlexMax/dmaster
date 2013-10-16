@@ -113,7 +113,7 @@ socket.on('message', function(msg, rinfo) {
 		console.log('master query ignored, permanently banned from the master server.');
 		break;
 	case zan.MSC_REQUESTIGNORED:
-		console.log('master query ignored, please throttle requests to a minimum 3 seconds.');
+		console.log('master query ignored, please throttle your requests.');
 		break;
 	case zan.MSC_WRONGVERSION:
 		console.log('master query ignored, protocol version out of date.');
@@ -146,7 +146,7 @@ socket.on('listening', function() {
 	var address = this.address();
 	console.log('dmaster listening on ' + address.address + ':' + address.port + '.');
 
-	send_challenge(this);
+	setInterval(send_challenge, 15000, this);
 });
 
 socket.bind(dmaster_port);
