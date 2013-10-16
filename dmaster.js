@@ -135,23 +135,16 @@ socket.on('message', function(msg, rinfo) {
 			}
 		}
 
-		db.all('SELECT COUNT(*) FROM servers;', function(err, rows) {
-			console.log(err);
-			console.log(rows);
-		});
-
+		console.log('server list retrieved from ' + rinfo.address + ':' + rinfo.port + '.');
 		break;
 	default:
 		throw new Error('unrecognized response ' + flag + '.');
 	}
-
-	console.log(data);
-	console.log(rinfo);
 });
 
 socket.on('listening', function() {
 	var address = this.address();
-	console.log('dmaster listening on ' + address.address + ':' + address.port);
+	console.log('dmaster listening on ' + address.address + ':' + address.port + '.');
 
 	send_challenge(this);
 });
