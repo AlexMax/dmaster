@@ -14,7 +14,7 @@ var zan = require('./zandronum.js');
 
 var socket = dgram.createSocket('udp4');
 var db = new sqlite3.Database(':memory:');
-var huf = huffman.createHuffman(zan.huffmanFreqs);
+var huf = new huffman.Huffman(zan.huffmanFreqs);
 
 db.on('open', function() {
 	this.exec(
