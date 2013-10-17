@@ -1,14 +1,7 @@
-// == START CONFIG ==
-
-var dmaster_dgram_port = 10700;
-var dmaster_web_port = 8080;
-
-var master_address = 'master.zandronum.com';
-var master_port = 15300;
-
-// == END CONFIG ==
-
+var config = require('config');
 var dgram = require('dgram');
+var printf = require('printf');
+
 var db = require('./db.js');
 var huffman = require('./huffman.js');
 var webapp = require('./webapp.js');
@@ -18,15 +11,20 @@ var socket = dgram.createSocket('udp4');
 var huf = new huffman.Huffman(zan.huffmanFreqs);
 
 function send_challenge(socket) {
-	var challenge = huf.encode(Buffer.concat([zan.LAUNCHER_MASTER_CHALLENGE, zan.MASTER_SERVER_VERSION]));
+	const masters = config.masters;
+	const challenge = huf.encode(Buffer.concat([zan.LAUNCHER_MASTER_CHALLENGE, zan.MASTER_SERVER_VERSION]));
 
-	socket.send(challenge, 0, challenge.length, master_port, master_address, function(error, length) {
-		if (error) {
-			console.log('error ' + error + '.');
-		} else {
-			console.log('sent challenge to ' + master_address + ':' + master_port + '.');
-		}
-	});
+	for (var i = 0;i < masters.length;i++) {
+		(function(i) {
+			socket.send(challenge, 0, challenge.length, masters[i].port, masters[i].address, function(error, length) {
+				if (error) {
+					console.log('error ' + error + '.');
+				} else {
+					console.log(printf('sent challenge to %s:%d.', masters[i].address, masters[i].port));
+				}
+			});
+		})(i);
+	}
 }
 
 function unmarshallServerList(data) {
@@ -130,6 +128,5 @@ socket.on('listening', function() {
 	setInterval(send_challenge, 15000, this);
 });
 
-socket.bind(dmaster_dgram_port);
-
-webapp.listen(dmaster_web_port);
+socket.bind(config.dmaster.udpPort);
+webapp.listen(config.dmaster.webPort);

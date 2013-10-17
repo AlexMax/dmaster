@@ -1,0 +1,14 @@
+{
+	"dmaster": {
+		"udpPort": 10700,
+		"webPort": 8080
+	},
+	"masters": [
+		{
+			"type": "zandronum",
+			"address": "master.zandronum.com",
+			"port": 15300,
+			"timeout": 15
+		}
+	]
+}
