@@ -1,3 +1,4 @@
+var BufferList = require('bl');
 var config = require('config');
 var dgram = require('dgram');
 var printf = require('printf');
@@ -9,6 +10,25 @@ var zan = require('./zandronum.js');
 
 var socket = dgram.createSocket('udp4');
 var huf = new huffman.Huffman(zan.huffmanFreqs);
+
+function send_query(socket) {
+	var flags = zan.SQF_MAXPLAYERS | zan.SQF_MAXCLIENTS | zan.SQF_FORCEPASSWORD |
+	            zan.SQF_IWAD | zan.SQF_MAPNAME | zan.SQF_GAMENAME | zan.SQF_NAME |
+	            zan.SQF_URL | zan.SQF_EMAIL;
+	var queryFlags = new Buffer(4);
+	queryFlags.writeUInt32LE(flags, 0);
+
+	const timestamp = new Buffer([0, 0, 0, 0]);
+	const challenge = huf.encode(Buffer.concat([zan.LAUNCHER_SERVER_CHALLENGE, queryFlags, timestamp]));
+
+	db.each('SELECT id, address, port FROM servers;', function(err, row) {
+		socket.send(challenge, 0, challenge.length, row.port, row.address, function(error, length) {
+			if (error) {
+				console.log('error: ' + error + '.');
+			}
+		});
+	});
+}
 
 function send_challenge(socket) {
 	const masters = config.masters;
@@ -83,13 +103,20 @@ function unmarshallServerList(data) {
 	}
 }
 
+function unmarshallServerInfo(data) {
+	var buffer = new BufferList(data);
+
+	buffer.consume(4); // don't care about ping
+
+}
+
 socket.on('message', function(msg, rinfo) {
 	var data = huf.decode(msg);
 	var flag = data.readUInt32LE(0);
 
 	switch (flag) {
 	case zan.MSC_IPISBANNED:
-		console.log('master query ignored, permanently banned from the master server.');
+		console.log('master query ignored, banned from the master server.');
 		break;
 	case zan.MSC_REQUESTIGNORED:
 		console.log('master query ignored, please throttle your requests.');
@@ -114,7 +141,18 @@ socket.on('message', function(msg, rinfo) {
 			}
 		}
 
-		console.log('server list retrieved from ' + rinfo.address + ':' + rinfo.port + '.');
+		console.log('master list retrieved from ' + rinfo.address + ':' + rinfo.port + '.');
+		break;
+	case zan.SERVER_LAUNCHER_CHALLENGE:
+		var serverInfo = unmarshallServerInfo(data.slice(4));
+
+		console.log('server info retrieved from ' + rinfo.address + ':' + rinfo.port + '.');
+		break;
+	case zan.SERVER_LAUNCHER_IGNORING:
+		console.log('server query ignored, please throttle your requests.');
+		break;
+	case zan.SERVER_LAUNCHER_BANNED:
+		console.log('server query ignored, banned from the  server.');
 		break;
 	default:
 		throw new Error('unrecognized response ' + flag + '.');
@@ -123,9 +161,12 @@ socket.on('message', function(msg, rinfo) {
 
 socket.on('listening', function() {
 	var address = this.address();
-	console.log('dgram listening on ' + address.address + ':' + address.port + '.');
+	console.log('UDP socket listening on ' + address.address + ':' + address.port + '.');
+
+	send_challenge(this);
 
 	setInterval(send_challenge, 15000, this);
+	setInterval(send_query, 5000, this);
 });
 
 socket.bind(config.dmaster.udpPort);

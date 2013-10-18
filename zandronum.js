@@ -37,6 +37,7 @@ exports.huffmanFreqs = [
 // Client queries
 exports.LAUNCHER_MASTER_CHALLENGE = new Buffer([0x7c, 0x5d, 0x56, 0x00]);
 exports.MASTER_SERVER_VERSION = new Buffer([0x02, 0x00]);
+exports.LAUNCHER_SERVER_CHALLENGE = new Buffer([0xc7, 0x00, 0x00, 0x00]);
 
 // Client data queries
 exports.SQF_NAME              = 1 << 0;
@@ -74,3 +75,8 @@ exports.MSC_WRONGVERSION = 0x05;
 exports.MSC_BEGINSERVERLISTPART = 0x06;
 exports.MSC_ENDSERVERLISTPART = 0x07;
 exports.MSC_SERVERBLOCK = 0x08;
+
+// Possible server responses
+exports.SERVER_LAUNCHER_CHALLENGE = 5660023;
+exports.SERVER_LAUNCHER_IGNORING = 5660024;
+exports.SERVER_LAUNCHER_BANNED = 5660025;
