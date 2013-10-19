@@ -12,8 +12,8 @@ var huf = new huffman.Huffman(zan.huffmanFreqs);
 
 function send_query(socket) {
 	var flags = zan.SQF_MAXPLAYERS | zan.SQF_MAXCLIENTS | zan.SQF_FORCEPASSWORD |
-	            zan.SQF_IWAD | zan.SQF_MAPNAME | zan.SQF_GAMENAME | zan.SQF_NAME |
-	            zan.SQF_URL | zan.SQF_EMAIL;
+				zan.SQF_IWAD | zan.SQF_MAPNAME | zan.SQF_GAMETYPE | zan.SQF_NAME |
+				zan.SQF_URL | zan.SQF_EMAIL | zan.SQF_PWADS;
 	var queryFlags = new Buffer(4);
 	queryFlags.writeUInt32LE(flags, 0);
 
@@ -148,9 +148,94 @@ function unmarshallServerInfo(data) {
 		marker += 1;
 	}
 
+	// Maximum players
 	if (flags & zan.SQF_MAXPLAYERS) {
 		output['maxplayers'] = data.readUInt8(marker);
 		marker += 1;
+	}
+
+	// PWADs
+	if (flags & zan.SQF_PWADS) {
+		var len = data.readUInt8(marker);
+		output['pwads'] = Array(len);
+		marker += 1;
+
+		for (var i = 0;i < len;i++) {
+			var pwadNULL = data.indexOf(nullByte, marker);
+			output['pwads'][i] = data.toString('ascii', marker, pwadNULL);
+			marker = pwadNULL + 1;
+		}
+	}
+
+	// Gametype
+	if (flags & zan.SQF_GAMETYPE) {
+		var gametype = data.readUInt8(marker);
+		var instagib = data.readUInt8(marker + 1);
+		var buckshot = data.readUInt8(marker + 2);
+
+		output['gametype'] = zan.GAMEMODES[gametype];
+		marker += 3;
+	}
+
+	// Gamename
+	if (flags & zan.SQF_GAMENAME) {
+		var gameNameNULL = data.indexOf(nullByte, marker);
+		output['gamename'] = data.toString('ascii', marker, gameNameNULL);
+		marker = gameNameNULL + 1;
+	}
+
+	// IWAD
+	if (flags & zan.SQF_IWAD) {
+		var iwadNULL = data.indexOf(nullByte, marker);
+		output['iwad'] = data.toString('ascii', marker, iwadNULL);
+		marker = iwadNULL + 1;
+	}
+
+	// Password
+	if (flags & zan.SQF_FORCEPASSWORD) {
+		output['password'] = data.readUInt8(marker);
+		marker += 1;
+	}
+
+	// Join password
+	if (flags & zan.SQF_FORCEJOINPASSWORD) {
+		output['joinpassword'] = data.readUInt8(marker);
+		marker += 1;
+	}
+
+	// Game skill
+	if (flags & zan.SQF_GAMESKILL) {
+		output['joinpassword'] = data.readUInt8(marker);
+		marker += 1;
+	}
+
+	// Bot skill
+	if (flags & zan.SQF_BOTSKILL) {
+		output['joinpassword'] = data.readUInt8(marker);
+		marker += 1;
+	}
+
+	// DMFlags
+	if (flags & zan.SQF_DMFLAGS) {
+		output['dmflags'] = data.readUInt32LE(marker);
+		output['dmflags2'] = data.readUInt32LE(marker + 4);
+		output['compatflags'] = data.readUInt32LE(marker + 8);
+		marker += 13;
+	}
+
+	// Game limits
+	if (flags & zan.SQF_LIMITS) {
+		output['fraglimit'] = data.readUInt16LE(marker);
+		output['timelimit'] = data.readUInt16LE(marker + 2);
+
+		if (output['timelimit'] > 0) {
+			output['timeleft'] = data.readUInt16LE(marker);
+			marker += 2; // So the rest of the reads will line up
+		}
+
+		output['duellimit'] = data.readUInt16LE(marker + 4);
+		output['pointlimit'] = data.readUInt16LE(marker + 6);
+		output['winlimit'] = data.readUInt16LE(marker + 8);
 	}
 
 	return output;

@@ -80,3 +80,23 @@ exports.MSC_SERVERBLOCK = 0x08;
 exports.SERVER_LAUNCHER_CHALLENGE = 5660023;
 exports.SERVER_LAUNCHER_IGNORING = 5660024;
 exports.SERVER_LAUNCHER_BANNED = 5660025;
+
+// Possible gametypes
+exports.GAMEMODES = {
+	0: "Cooperative",
+	1: "Survival",
+	2: "Invasion",
+	3: "Deathmatch",
+	4: "Teamplay",
+	5: "Duel",
+	6: "Terminator",
+	7: "Last Man Standing",
+	8: "Team Last Man Standing",
+	9: "Possession",
+	10: "Team Possession",
+	11: "Teamgame",
+	12: "Capture the Flag",
+	13: "One Flag",
+	14: "Skulltag",
+	15: "Domination"
+};
