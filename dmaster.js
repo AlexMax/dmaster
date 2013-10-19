@@ -272,6 +272,13 @@ socket.on('message', function(msg, rinfo) {
 		break;
 	case zan.SERVER_LAUNCHER_CHALLENGE:
 		var serverInfo = unmarshallServerInfo(data.slice(4));
+		var stmt = 'UPDATE servers SET name=? WHERE address = ? AND port = ?;'
+
+		db.run(stmt, serverInfo.name, rinfo.address, rinfo.port, function(error) {
+			if (error) {
+				throw new Error(error);
+			}
+		});
 		break;
 	case zan.SERVER_LAUNCHER_IGNORING:
 		console.log('server query ignored, please throttle your requests.');
@@ -290,7 +297,7 @@ socket.on('listening', function() {
 
 	send_challenge(this);
 
-	setInterval(send_challenge, 15000, this);
+	setInterval(send_challenge, 30000, this);
 	setInterval(send_query, 5000, this);
 });
 
