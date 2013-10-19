@@ -9,7 +9,7 @@ db.on('open', function() {
 			'id INTEGER PRIMARY KEY AUTOINCREMENT, address TEXT, port INT,' +
 			'maxplayers INT, maxclients INT, password INT, iwad TEXT,' +
 			'map TEXT, gametype TEXT, name TEXT, url TEXT, email TEXT, ' +
-			'updated INT, UNIQUE (address, port) ON CONFLICT IGNORE' +
+			'updated TEXT, UNIQUE (address, port) ON CONFLICT IGNORE' +
 		');' +
 		'CREATE TABLE players(' +
 			'server_id INT, ping INT, score INT, team INT, spec INT,' +

@@ -272,7 +272,7 @@ socket.on('message', function(msg, rinfo) {
 		break;
 	case zan.SERVER_LAUNCHER_CHALLENGE:
 		var serverInfo = unmarshallServerInfo(data.slice(4));
-		var stmt = 'UPDATE servers SET name=? WHERE address = ? AND port = ?;'
+		var stmt = 'UPDATE servers SET name=?, updated=datetime(\'now\') WHERE address = ? AND port = ?;'
 
 		db.run(stmt, serverInfo.name, rinfo.address, rinfo.port, function(error) {
 			if (error) {

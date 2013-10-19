@@ -18,7 +18,7 @@ webapp.get('/', function(req, res) {
 	res.redirect(301, '/servers');
 });
 webapp.get('/servers', function(req, res) {
-	db.all('SELECT * FROM servers;', function(err, rows) {
+	db.all('SELECT * FROM servers WHERE updated IS NOT NULL;', function(err, rows) {
 		res.locals = {servers: rows};
 		res.render('servers');
 	});
@@ -30,7 +30,7 @@ webapp.get('/servers/:address::port', function(req, res) {
 // REST routes v1
 (function(prefix) {
 	webapp.get(prefix + '/servers', function(req, res) {
-		db.all('SELECT * FROM servers;', function(err, rows) {
+		db.all('SELECT * FROM servers WHERE updated IS NOT NULL;', function(err, rows) {
 			res.send(rows);
 		});
 	});
