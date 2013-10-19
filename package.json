@@ -1,7 +1,7 @@
 {
 	"name": "dmaster",
 	"dependencies": {
-		"bl": "0.5.0",
+		"buffertools": "1.1.1",
 		"config": "0.4.30",
 		"express": "3.4.x",
 		"printf": "0.1.2",

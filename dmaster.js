@@ -1,4 +1,3 @@
-var BufferList = require('bl');
 var config = require('config');
 var dgram = require('dgram');
 var printf = require('printf');
@@ -104,10 +103,57 @@ function unmarshallServerList(data) {
 }
 
 function unmarshallServerInfo(data) {
-	var buffer = new BufferList(data);
+	var nullByte = new Buffer([0x00]);
+	var output = {};
 
-	buffer.consume(4); // don't care about ping
+	// Version
+	var versionNULL = data.indexOf(nullByte, 4);
+	var version = data.toString('ascii', 4, versionNULL);
 
+	// Pick apart the rest of the response based on what flags we got.
+	var flags = data.readUInt32LE(versionNULL + 1);
+	var marker = versionNULL + 5;
+
+	// Name
+	if (flags & zan.SQF_NAME) {
+		var nameNULL = data.indexOf(nullByte, marker);
+		output['name'] = data.toString('ascii', marker, nameNULL);
+		marker = nameNULL + 1;
+	}
+
+	// URL
+	if (flags & zan.SQF_URL) {
+		var urlNULL = data.indexOf(nullByte, marker);
+		output['url'] = data.toString('ascii', marker, urlNULL);
+		marker = urlNULL + 1;
+	}
+
+	// Email
+	if (flags & zan.SQF_EMAIL) {
+		var emailNULL = data.indexOf(nullByte, marker);
+		output['email'] = data.toString('ascii', marker, emailNULL);
+		marker = emailNULL + 1;
+	}
+
+	// Map name
+	if (flags & zan.SQF_MAPNAME) {
+		var mapNameNULL = data.indexOf(nullByte, marker);
+		output['map'] = data.toString('ascii', marker, mapNameNULL);
+		marker = mapNameNULL + 1;
+	}
+
+	// Maximum clients
+	if (flags & zan.SQF_MAXCLIENTS) {
+		output['maxclients'] = data.readUInt8(marker);
+		marker += 1;
+	}
+
+	if (flags & zan.SQF_MAXPLAYERS) {
+		output['maxplayers'] = data.readUInt8(marker);
+		marker += 1;
+	}
+
+	return output;
 }
 
 socket.on('message', function(msg, rinfo) {
@@ -145,6 +191,7 @@ socket.on('message', function(msg, rinfo) {
 		break;
 	case zan.SERVER_LAUNCHER_CHALLENGE:
 		var serverInfo = unmarshallServerInfo(data.slice(4));
+		console.log(serverInfo);
 
 		console.log('server info retrieved from ' + rinfo.address + ':' + rinfo.port + '.');
 		break;

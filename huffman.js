@@ -1,4 +1,4 @@
-var BufferList = require('bl');
+var buffertools = require('buffertools');
 var printf = require('printf');
 
 var Huffman = function(freq) {
@@ -112,20 +112,20 @@ Huffman.prototype.decode = function(data) {
 
 	// Repeatedly traverse the huffman tree turning the huffman code
 	// into the original byte.
-	var decoded = new BufferList();
+	var decoded = new buffertools.WritableBufferStream();
 	var node = this.tree;
 	for (var i = 0;i < bitString.length;i++) {
 		var bit = bitString.charAt(i);
 		if (bit in node) {
 			node = node[bit];
 		} else {
-			decoded.append(new Buffer([node.asc]));
+			decoded.write(new Buffer([node.asc]));
 			node = this.tree[bit];
 		}
 	}
-	decoded.append(new Buffer([node.asc]));
+	decoded.write(new Buffer([node.asc]));
 
-	return decoded.slice();
+	return decoded.getBuffer();
 };
 
 exports.Huffman = Huffman;
