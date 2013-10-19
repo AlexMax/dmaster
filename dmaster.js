@@ -23,7 +23,7 @@ function send_query(socket) {
 	db.each('SELECT id, address, port FROM servers;', function(err, row) {
 		socket.send(challenge, 0, challenge.length, row.port, row.address, function(error, length) {
 			if (error) {
-				console.log('error: ' + error + '.');
+				console.log('server query error: ' + error + '.');
 			}
 		});
 	});
@@ -37,9 +37,7 @@ function send_challenge(socket) {
 		(function(i) {
 			socket.send(challenge, 0, challenge.length, masters[i].port, masters[i].address, function(error, length) {
 				if (error) {
-					console.log('error ' + error + '.');
-				} else {
-					console.log(printf('sent challenge to %s:%d.', masters[i].address, masters[i].port));
+					console.log('mater challenge error: ' + error + '.');
 				}
 			});
 		})(i);
@@ -271,14 +269,9 @@ socket.on('message', function(msg, rinfo) {
 				});
 			}
 		}
-
-		console.log('master list retrieved from ' + rinfo.address + ':' + rinfo.port + '.');
 		break;
 	case zan.SERVER_LAUNCHER_CHALLENGE:
 		var serverInfo = unmarshallServerInfo(data.slice(4));
-		console.log(serverInfo);
-
-		console.log('server info retrieved from ' + rinfo.address + ':' + rinfo.port + '.');
 		break;
 	case zan.SERVER_LAUNCHER_IGNORING:
 		console.log('server query ignored, please throttle your requests.');

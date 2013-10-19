@@ -4,13 +4,27 @@ var db = require('./db.js');
 var webapp = express();
 
 // App configuration
-webapp.use(express.logger());
 webapp.use(express.compress());
 webapp.use('/static', express.static('static'));
 
+// Hogan templates
+webapp.set('view engine', 'html');
+webapp.set('layout', 'layout');
+webapp.enable('view cache');
+webapp.engine('html', require('hogan-express'));
+
 // App routes
 webapp.get('/', function(req, res) {
-	res.send('hello, world!');
+	res.redirect(301, '/servers');
+});
+webapp.get('/servers', function(req, res) {
+	db.all('SELECT * FROM servers;', function(err, rows) {
+		res.locals = {servers: rows};
+		res.render('servers');
+	});
+});
+webapp.get('/servers/:address::port', function(req, res) {
+	res.send('server');
 });
 
 // REST routes v1
