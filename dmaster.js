@@ -13,9 +13,7 @@ var huf = new huffman.Huffman(zan.huffmanFreqs);
 function send_query(socket) {
 	var flags = zan.SQF_MAXPLAYERS | zan.SQF_MAXCLIENTS | zan.SQF_FORCEPASSWORD |
 				zan.SQF_IWAD | zan.SQF_MAPNAME | zan.SQF_GAMETYPE | zan.SQF_NAME |
-				zan.SQF_URL | zan.SQF_EMAIL | zan.SQF_PWADS | zan.SQF_PLAYERDATA |
-				zan.SQF_TEAMINFO_NUMBER | zan.SQF_TEAMINFO_NAME | zan.SQF_TEAMINFO_COLOR |
-				zan.SQF_TEAMINFO_SCORE;
+				zan.SQF_URL | zan.SQF_EMAIL | zan.SQF_PLAYERDATA | zan.SQF_PWADS;
 	var queryFlags = new Buffer(4);
 	queryFlags.writeUInt32LE(flags, 0);
 
@@ -325,7 +323,7 @@ function unmarshallServerInfo(data) {
 
 	// Team colors.
 	if (flags & zan.SQF_TEAMINFO_COLOR) {
-		if (players === null) {
+		if (teams === null) {
 			throw new Error('Team data without team count.');
 		}
 
@@ -337,7 +335,7 @@ function unmarshallServerInfo(data) {
 
 	// Team scores.
 	if (flags & zan.SQF_TEAMINFO_SCORE) {
-		if (players === null) {
+		if (teams === null) {
 			throw new Error('Team data without team count.');
 		}
 
@@ -345,6 +343,39 @@ function unmarshallServerInfo(data) {
 			output['teams'][i]['score'] = data.readUInt16LE(marker);
 			marker += 2;
 		}
+	}
+
+	// Test server
+	if (flags & zan.SQF_TESTING_SERVER) {
+		data.readUInt8(marker);
+
+		var testingNULL = data.indexOf(nullByte, marker + 1);
+		var testing = data.toString('ascii', marker, testingNULL);
+		marker = testingNULL + 1;
+
+		output['testing'] = (testing === '') ? testing : null;
+	}
+
+	// Ignored.  Skip past it if it's been supplied.
+	if (flags & zan.SQF_DATA_MD5SUM) {
+		marker += data.indexOf(nullByte, marker) + 1;
+	}
+
+	// DMFlags.
+	if (flags & zan.SQF_ALL_DMFLAGS) {
+		const flagkeys = ['dmflags', 'dmflags2', 'dmflags3', 'compatflags', 'compatflags2'];
+		var flags = data.readUInt8(marker);
+		marker += 1;
+
+		for (var i = 0;i < flags;i++) {
+			output[flagkeys[i]] = data.readUInt32LE(marker);
+			marker += 4;
+		}
+	}
+
+	// Server enforces master banlist?
+	if (flags & zan.SQF_SECURITY_SETTINGS) {
+		output['masterbanlist'] = data.readUInt8(marker);
 	}
 
 	return output;
@@ -383,11 +414,7 @@ socket.on('message', function(msg, rinfo) {
 		break;
 	case zan.SERVER_LAUNCHER_CHALLENGE:
 		var serverInfo = unmarshallServerInfo(data.slice(4));
-
-		console.log(serverInfo);
-
 		var stmt = 'UPDATE servers SET name=?, updated=datetime(\'now\') WHERE address = ? AND port = ?;'
-
 		db.run(stmt, serverInfo.name, rinfo.address, rinfo.port, function(error) {
 			if (error) {
 				throw new Error(error);
