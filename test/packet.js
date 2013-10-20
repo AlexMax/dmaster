@@ -12,4 +12,10 @@ describe('unmarshallServerList()', function() {
 			packet.unmarshallServerInfo(data.slice(4));
 		});
 	});
+	it('should unmarshall be_complex_alien_vendetta.dat.', function() {
+		assert.doesNotThrow(function() {
+			var data = fs.readFileSync(__dirname + '/packets/be_complex_alien_vendetta.dat');
+			packet.unmarshallServerInfo(data.slice(4));
+		});
+	});
 });
