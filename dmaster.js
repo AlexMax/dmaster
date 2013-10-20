@@ -13,7 +13,9 @@ var huf = new huffman.Huffman(zan.huffmanFreqs);
 function send_query(socket) {
 	var flags = zan.SQF_MAXPLAYERS | zan.SQF_MAXCLIENTS | zan.SQF_FORCEPASSWORD |
 				zan.SQF_IWAD | zan.SQF_MAPNAME | zan.SQF_GAMETYPE | zan.SQF_NAME |
-				zan.SQF_URL | zan.SQF_EMAIL | zan.SQF_PWADS;
+				zan.SQF_URL | zan.SQF_EMAIL | zan.SQF_PWADS | zan.SQF_PLAYERDATA |
+				zan.SQF_TEAMINFO_NUMBER | zan.SQF_TEAMINFO_NAME | zan.SQF_TEAMINFO_COLOR |
+				zan.SQF_TEAMINFO_SCORE;
 	var queryFlags = new Buffer(4);
 	queryFlags.writeUInt32LE(flags, 0);
 
@@ -166,12 +168,13 @@ function unmarshallServerInfo(data) {
 	}
 
 	// Gametype
+	var gametype = null; // Also used in SQF_PLAYERDATA.
 	if (flags & zan.SQF_GAMETYPE) {
-		var gametype = data.readUInt8(marker);
+		gametype = data.readUInt8(marker);
 		var instagib = data.readUInt8(marker + 1);
 		var buckshot = data.readUInt8(marker + 2);
 
-		output['gametype'] = zan.GAMEMODES[gametype];
+		output['gametype'] = zan.GAMEMODES[gametype].name;
 		marker += 3;
 	}
 
@@ -218,7 +221,7 @@ function unmarshallServerInfo(data) {
 		output['dmflags'] = data.readUInt32LE(marker);
 		output['dmflags2'] = data.readUInt32LE(marker + 4);
 		output['compatflags'] = data.readUInt32LE(marker + 8);
-		marker += 13;
+		marker += 12;
 	}
 
 	// Game limits
@@ -234,6 +237,114 @@ function unmarshallServerInfo(data) {
 		output['duellimit'] = data.readUInt16LE(marker + 4);
 		output['pointlimit'] = data.readUInt16LE(marker + 6);
 		output['winlimit'] = data.readUInt16LE(marker + 8);
+		marker += 10;
+	}
+
+	// Team damage
+	if (flags & zan.SQF_TEAMDAMAGE) {
+		output['teamdamage'] = data.readFloatLE(marker);
+		marker += 4;
+	}
+
+	// Depricated.
+	if (flags & zan.SQF_TEAMSCORES) {
+		marker += 4;
+	}
+
+	// Player count.  We don't deal with this directly, but we do need the
+	// count in order to know how many players we need to loop through.
+	var players = null;
+	if (flags & zan.SQF_NUMPLAYERS) {
+		players = data.readUInt8(marker);
+		marker += 1;
+	}
+
+	// Player information.
+	if (flags & zan.SQF_PLAYERDATA) {
+		if (players === null) {
+			throw new Error('Player data without player count.');
+		}
+
+		if (gametype === null) {
+			throw new Error('Player data without gametype.');
+		}
+
+		output['players'] = Array(players);
+		for (var i = 0;i < players;i++) {
+			var player = {};
+
+			var playerNameNULL = data.indexOf(nullByte, marker);
+			player['name'] = data.toString('ascii', marker, playerNameNULL);
+			marker = playerNameNULL + 1;
+
+			player['score'] = data.readUInt16LE(marker);
+			player['ping'] = data.readUInt16LE(marker + 2);
+			player['spectator'] = data.readUInt8(marker + 4);
+			player['bot'] = data.readUInt8(marker + 5);
+
+			if (zan.GAMEMODES[gametype].playersOnTeams) {
+				player['team'] = data.readUInt8(marker + 6);
+				marker += 1;
+			}
+
+			player['time'] = data.readUInt8(marker + 6);
+			marker += 7;
+
+			output['players'][i] = player;
+		}
+	}
+
+	// Team count.  Same as player count, we don't deal with this directly.
+	var teams = null;
+	if (flags & zan.SQF_TEAMINFO_NUMBER) {
+		teams = data.readUInt8(marker);
+		marker += 1;
+	}
+
+	// Populate the team information array if we have information to populate.
+	if (flags & zan.SQF_TEAMINFO_NAME || flags & zan.SQF_TEAMINFO_COLOR ||
+	    flags & zan.SQF_TEAMINFO_SCORE) {
+		output['teams'] = Array(teams);
+		for (var i = 0;i < teams;i++) {
+			output['teams'][i] = {};
+		}
+	}
+
+	// Team names.
+	if (flags & zan.SQF_TEAMINFO_NAME) {
+		if (teams === null) {
+			throw new Error('Team data without team count.');
+		}
+
+		for (var i = 0;i < teams;i++) {
+			var teamNameNULL = data.indexOf(nullByte, marker);
+			output['teams'][i]['name'] = data.toString('ascii', marker, teamNameNULL);
+			marker = teamNameNULL + 1;
+		}
+	}
+
+	// Team colors.
+	if (flags & zan.SQF_TEAMINFO_COLOR) {
+		if (players === null) {
+			throw new Error('Team data without team count.');
+		}
+
+		for (var i = 0;i < teams;i++) {
+			output['teams'][i]['color'] = data.readUInt32LE(marker);
+			marker += 4;
+		}
+	}
+
+	// Team scores.
+	if (flags & zan.SQF_TEAMINFO_SCORE) {
+		if (players === null) {
+			throw new Error('Team data without team count.');
+		}
+
+		for (var i = 0;i < teams;i++) {
+			output['teams'][i]['score'] = data.readUInt16LE(marker);
+			marker += 2;
+		}
 	}
 
 	return output;
@@ -272,6 +383,9 @@ socket.on('message', function(msg, rinfo) {
 		break;
 	case zan.SERVER_LAUNCHER_CHALLENGE:
 		var serverInfo = unmarshallServerInfo(data.slice(4));
+
+		console.log(serverInfo);
+
 		var stmt = 'UPDATE servers SET name=?, updated=datetime(\'now\') WHERE address = ? AND port = ?;'
 
 		db.run(stmt, serverInfo.name, rinfo.address, rinfo.port, function(error) {

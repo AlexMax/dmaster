@@ -83,20 +83,20 @@ exports.SERVER_LAUNCHER_BANNED = 5660025;
 
 // Possible gametypes
 exports.GAMEMODES = {
-	0: "Cooperative",
-	1: "Survival",
-	2: "Invasion",
-	3: "Deathmatch",
-	4: "Teamplay",
-	5: "Duel",
-	6: "Terminator",
-	7: "Last Man Standing",
-	8: "Team Last Man Standing",
-	9: "Possession",
-	10: "Team Possession",
-	11: "Teamgame",
-	12: "Capture the Flag",
-	13: "One Flag",
-	14: "Skulltag",
-	15: "Domination"
+	0: {name: "Cooperative", playersOnTeams: false},
+	1: {name: "Survival", playersOnTeams: false},
+	2: {name: "Invasion", playersOnTeams: false},
+	3: {name: "Deathmatch", playersOnTeams: false},
+	4: {name: "Team Deathmatch", playersOnTeams: true},
+	5: {name: "Duel", playersOnTeams: false},
+	6: {name: "Terminator", playersOnTeams: false},
+	7: {name: "Last Man Standing", playersOnTeams: false},
+	8: {name: "Team Last Man Standing", playersOnTeams: true},
+	9: {name: "Possession", playersOnTeams: false},
+	10: {name: "Team Possession", playersOnTeams: true},
+	11: {name: "Teamgame", playersOnTeams: true},
+	12: {name: "Capture the Flag", playersOnTeams: true},
+	13: {name: "One Flag", playersOnTeams: true},
+	14: {name: "Skulltag", playersOnTeams: true},
+	15: {name: "Domination", playersOnTeams: true}
 };
