@@ -1,7 +1,8 @@
 var assert = require('assert');
-var zan = require('../zandronum.js');
+var fs = require('fs');
 
 var huffman = require('../huffman.js');
+var zan = require('../zandronum.js');
 
 describe('Huffman', function() {
 	describe('new Huffman()', function() {
@@ -44,11 +45,18 @@ describe('Huffman', function() {
 		});
 	});
 	describe('Huffman.decode()', function() {
-		it('should be able to huffman-decode the Zandronum master challenge.', function() {
-			var h = new huffman.Huffman(zan.huffmanFreqs);
+		var h = new huffman.Huffman(zan.huffmanFreqs);
+
+		it('should properly decode the Zandronum master challenge.', function() {
 			var decoded = h.decode(new Buffer([0x06, 0x68, 0x12, 0xf1, 0x52, 0x27, 0x01]));
 			var test = Buffer.concat([zan.LAUNCHER_MASTER_CHALLENGE, zan.MASTER_SERVER_VERSION]);
 			assert.equal('7c5d56000200', decoded.toString('hex'));
+		});
+		it('should properly decode a server query packet from a zomb-8 server.', function() {
+			var raw = new Buffer(fs.readFileSync(__dirname + '/packets/be_zomb8_raw.dat'));
+			var huffman = new Buffer(fs.readFileSync(__dirname + '/packets/be_zomb8_huffman.dat'));
+			var decoded = h.decode(raw);
+			assert.equal(decoded.toString('hex'), huffman.toString('hex'));
 		});
 	});
 });
