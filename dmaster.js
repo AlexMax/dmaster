@@ -1,6 +1,7 @@
 var config = require('config');
 var dgram = require('dgram');
 var printf = require('printf');
+var q = require('q');
 
 var db = require('./db.js');
 var huffman = require('./huffman.js');
@@ -77,16 +78,30 @@ socket.on('message', function(msg, rinfo) {
 		}
 		break;
 	case zan.SERVER_LAUNCHER_CHALLENGE:
-		var serverInfo = packet.unmarshallServerInfo(data.slice(4));
+		// Look up the id associated with the given address and port.  Stores
+		// the value in a promise so we can unmarshall packets while we wait
+		// on the id to be returned.
+		var serverId = q.defer();
+		db.get(
+			'SELECT id FROM servers WHERE address = ? AND port = ?;',
+			rinfo.address, rinfo.port,
+			function(err, row) {
+				if (err) {
+					serverId.reject(err);
+				} else {
+					serverId.resolve(row.id);
+				}
+			}
+		);
 
 		// Update basic server information.
-		var sets = [];
-		var params = [];
-
+		var serverInfo = packet.unmarshallServerInfo(data.slice(4));
 		const validServerColumns = [
 			'name', 'url', 'email', 'map', 'maxclients', 'maxplayers',
 			'gametype', 'iwad', 'password'
 		];
+		var sets = [];
+		var params = [];
 
 		for (var i = 0;i < validServerColumns.length;i++) {
 			if (validServerColumns[i] in serverInfo) {
@@ -96,15 +111,18 @@ socket.on('message', function(msg, rinfo) {
 		}
 
 		if (params.length > 0) {
-			params.push(rinfo.address);
-			params.push(rinfo.port);
-			var stmt =
-				'UPDATE servers SET ' + sets.join(',') + ',updated=datetime(\'now\') ' +
-				'WHERE address = ? AND PORT = ?';
-			db.run(stmt, params, function(error) {
-				if (error) {
-					throw new Error(error);
-				}
+			serverId.promise.then(function(value) {
+				params.push(value);
+				var stmt =
+					'UPDATE servers SET ' + sets.join(',') +
+					',updated=datetime(\'now\') WHERE id = ?';
+				db.run(stmt, params, function(error) {
+					if (error) {
+						throw new Error(error);
+					}
+				});
+			}, function(reason) {
+				console.log(reason);
 			});
 		}
 		break;
