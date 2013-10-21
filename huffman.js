@@ -20,6 +20,10 @@ var Huffman = function(freq) {
 
 	var self = this;
 
+	// The original C++ code uses floats and Javascript uses doubles.  This
+	// epsilon is necessary in order to make sure our float comparisons work.
+	const epsilon = 0.0000001;
+
 	// Create starting leaves
 	for (var i = 0;i < 256;i++) {
 		this.tree[i] = {
@@ -30,38 +34,38 @@ var Huffman = function(freq) {
 
 	// Pair leaves and branches based on frequency until there is a single root
 	for (var i = 0;i < 255;i++) {
-		var lowest_key1 = -1
-		var lowest_key2 = -1
-		var lowest_frq1 = 1e30
-		var lowest_frq2 = 1e30
+		var minat1 = -1;
+		var minat2 = -1;
+		var min1 = 1e30;
+		var min2 = 1e30;
 
 		// Find two lowest frequencies
 		for (var j = 0;j < 256;j++) {
 			if (!this.tree[j]) {
 				continue;
 			}
-			if (this.tree[j].frq < lowest_frq1) {
-				lowest_key2 = lowest_key1;
-				lowest_frq2 = lowest_frq1;
-				lowest_key1 = j;
-				lowest_frq1 = this.tree[j].frq;
-			} else if (this.tree[j].frq < lowest_frq2) {
-				lowest_key2 = j;
-				lowest_frq2 = this.tree[j].frq;
+			if (this.tree[j].frq < min1 - epsilon) {
+				minat2 = minat1;
+				min2 = min1;
+				minat1 = j;
+				min1 = this.tree[j].frq;
+			} else if (this.tree[j].frq < min2 - epsilon) {
+				minat2 = j;
+				min2 = this.tree[j].frq;
 			}
 		}
 
 		// Join the two together under a new branch
-		this.tree[lowest_key1] = {
-			frq: lowest_frq1 + lowest_frq2,
-			0: this.tree[lowest_key2],
-			1: this.tree[lowest_key1],
+		this.tree[minat1] = {
+			frq: min1 + min2,
+			0: this.tree[minat2],
+			1: this.tree[minat1],
 		}
-		this.tree[lowest_key2] = null;
+		this.tree[minat2] = undefined;
 	}
 
 	// Make the root the list
-	this.tree = this.tree[lowest_key1];
+	this.tree = this.tree[minat1];
 
 	// Create a lookup table from the binary tree
 	function treeWalker(branch, path) {
