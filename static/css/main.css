@@ -97,21 +97,13 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+tr:nth-child(odd) td {
+	background:white;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+tr:nth-child(even) td {
+	background:lightgray;
+}
 
 /* ==========================================================================
    Helper classes
