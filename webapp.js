@@ -13,10 +13,10 @@ webapp.use('/static', express.static('static'));
 webapp.locals.static = '/static/';
 
 // Hogan templates
-webapp.set('view engine', 'html');
+webapp.set('view engine', 'hgn');
 webapp.set('layout', 'layout');
 webapp.enable('view cache');
-webapp.engine('html', require('hogan-express'));
+webapp.engine('hgn', require('hogan-express'));
 
 // App routes
 webapp.get('/', function(req, res) {
