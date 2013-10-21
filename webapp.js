@@ -4,6 +4,10 @@ var db = require('./db.js');
 var webapp = express();
 
 // App configuration
+webapp.enable('trust proxy');
+
+// App middleware
+webapp.use(express.logger());
 webapp.use(express.compress());
 webapp.use('/static', express.static('static'));
 webapp.locals.static = '/static/';
