@@ -97,6 +97,12 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+body {
+	background-image:url('/static/img/logo64.png');
+	background-repeat:no-repeat;
+	background-position:right 16px top 16px;
+}
+
 tr:nth-child(odd) td {
 	background:white;
 }

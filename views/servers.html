@@ -6,13 +6,17 @@
 		<th>Players</th>
 		<th>WADs</th>
 		<th>Map</th>
+		<th>Address</th>
+		<th></th>
 	</tr>
 	{{#servers}}
 	<tr>
 		<td>{{name}}</td>
-		<td>{{players}}</td>
+		<td>{{players}}/{{maxplayers}}</td>
 		<td>{{wads}}</td>
-		<td>{{map}}<td>
+		<td>{{map}}</td>
+		<td>{{address}}:{{port}}</td>
+		<td><a href="zds://{{address}}:{{port}}/st">IDE</a></td>
 	</tr>
 	{{/servers}}
 </table>

@@ -88,14 +88,17 @@ socket.on('message', function(msg, rinfo) {
 			function(err, row) {
 				if (err) {
 					serverId.reject(err);
+				} else if (!('id' in row)) {
+					serverId.reject(rinfo.address + ':' + rinfo.port + ' was not found in the server database.');
 				} else {
 					serverId.resolve(row.id);
 				}
 			}
 		);
 
-		// Update basic server information.
 		var serverInfo = packet.unmarshallServerInfo(data.slice(4));
+
+		// Update basic server information.
 		const validServerColumns = [
 			'name', 'url', 'email', 'map', 'maxclients', 'maxplayers',
 			'gametype', 'iwad', 'password'
@@ -123,6 +126,31 @@ socket.on('message', function(msg, rinfo) {
 				});
 			}, function(reason) {
 				console.log(reason);
+			});
+		}
+
+		if ('players' in serverInfo && serverInfo.players.length > 0) {
+			serverId.promise.then(function(value) {
+				db.run('DELETE FROM players WHERE server_id = ?', value, function(error) {
+					if (error) {
+						throw error;
+					} else {
+						for (var i = 0;i < serverInfo.players.length;i++) {
+							var player = serverInfo.players[i];
+							db.run(
+								'INSERT INTO players ' +
+								'(server_id, ping, score, team, spec, name) ' + 
+								'VALUES (?, ?, ?, ?, ?, ?);',
+								value, player.ping, player.score, player.team, player.spectator, player.name,
+								function(error) {
+									if (error) {
+										throw (error);
+									}
+								}
+							);
+						}
+					}
+				});
 			});
 		}
 		break;

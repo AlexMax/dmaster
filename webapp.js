@@ -23,10 +23,20 @@ webapp.get('/', function(req, res) {
 	res.redirect(301, '/servers');
 });
 webapp.get('/servers', function(req, res) {
-	db.all('SELECT * FROM servers WHERE updated IS NOT NULL;', function(err, rows) {
-		res.locals = {servers: rows};
-		res.render('servers');
-	});
+	db.all(
+		'SELECT DISTINCT servers.address, servers.port, servers.name, servers.map, servers.maxplayers, ' +
+		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND players.spec = 0) AS players ' +
+		'FROM servers LEFT JOIN players ON servers.id = players.server_id '+
+		'WHERE servers.updated IS NOT NULL ORDER BY players DESC;',
+		function(err, rows) {
+			if (err) {
+				throw err;
+			} else {
+				res.locals = {servers: rows};
+				res.render('servers');
+			}
+		}
+	);
 });
 webapp.get('/servers/:address::port', function(req, res) {
 	res.send('server');
@@ -36,6 +46,11 @@ webapp.get('/servers/:address::port', function(req, res) {
 (function(prefix) {
 	webapp.get(prefix + '/servers', function(req, res) {
 		db.all('SELECT * FROM servers WHERE updated IS NOT NULL;', function(err, rows) {
+			res.send(rows);
+		});
+	});
+	webapp.get(prefix + '/players', function(req, res) {
+		db.all('SELECT * FROM players', function(err, rows) {
 			res.send(rows);
 		});
 	});
