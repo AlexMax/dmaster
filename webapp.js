@@ -6,6 +6,7 @@ var webapp = express();
 // App configuration
 webapp.use(express.compress());
 webapp.use('/static', express.static('static'));
+webapp.locals.static = '/static/';
 
 // Hogan templates
 webapp.set('view engine', 'html');
