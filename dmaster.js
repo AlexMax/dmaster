@@ -54,7 +54,7 @@ socket.on('message', function(msg, rinfo) {
 		console.log('master query ignored, banned from the master server.');
 		break;
 	case zan.MSC_REQUESTIGNORED:
-		console.log('master query ignored, please throttle your requests.');
+		// console.log('master query ignored, please throttle your requests.');
 		break;
 	case zan.MSC_WRONGVERSION:
 		console.log('master query ignored, protocol version out of date.');
@@ -78,20 +78,41 @@ socket.on('message', function(msg, rinfo) {
 		break;
 	case zan.SERVER_LAUNCHER_CHALLENGE:
 		var serverInfo = packet.unmarshallServerInfo(data.slice(4));
-		var stmt =
-			'UPDATE servers SET name=?, map=?, updated=datetime(\'now\') ' +
-			'WHERE address = ? AND port = ?;';
-		db.run(stmt, serverInfo.name, serverInfo.map, rinfo.address, rinfo.port, function(error) {
-			if (error) {
-				throw new Error(error);
+
+		// Update basic server information.
+		var sets = [];
+		var params = [];
+
+		const validServerColumns = [
+			'name', 'url', 'email', 'map', 'maxclients', 'maxplayers',
+			'gametype', 'iwad', 'password'
+		];
+
+		for (var i = 0;i < validServerColumns.length;i++) {
+			if (validServerColumns[i] in serverInfo) {
+				sets.push(validServerColumns[i] + '=?');
+				params.push(serverInfo[validServerColumns[i]]);
 			}
-		});
+		}
+
+		if (params.length > 0) {
+			params.push(rinfo.address);
+			params.push(rinfo.port);
+			var stmt =
+				'UPDATE servers SET ' + sets.join(',') + ',updated=datetime(\'now\') ' +
+				'WHERE address = ? AND PORT = ?';
+			db.run(stmt, params, function(error) {
+				if (error) {
+					throw new Error(error);
+				}
+			});
+		}
 		break;
 	case zan.SERVER_LAUNCHER_IGNORING:
-		console.log('server query ignored, please throttle your requests.');
+		// console.log('server query ignored, please throttle your requests.');
 		break;
 	case zan.SERVER_LAUNCHER_BANNED:
-		console.log('server query ignored, banned from the  server.');
+		console.log('server query ignored, banned from the server.');
 		break;
 	default:
 		throw new Error('unrecognized response ' + flag + '.');
