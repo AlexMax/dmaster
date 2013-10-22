@@ -40,8 +40,8 @@ webapp.get('/', function(req, res) {
 });
 webapp.get('/servers', function(req, res) {
 	db.all(
-		'SELECT DISTINCT servers.address, servers.port, servers.name, servers.map, servers.maxplayers, ' +
-		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND players.spec = 0) AS players ' +
+		'SELECT address, port, servers.name, map, maxplayers, ' +
+		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players ' +
 		'FROM servers LEFT JOIN players ON servers.id = players.server_id '+
 		'WHERE servers.updated IS NOT NULL ORDER BY players DESC;',
 		function(err, rows) {
@@ -66,9 +66,17 @@ webapp.get('/servers/:address::port', function(req, res) {
 		});
 	});
 	webapp.get(prefix + '/players', function(req, res) {
-		db.all('SELECT * FROM players', function(err, rows) {
-			res.send(rows);
-		});
+		db.all(
+			'SELECT address, port, ping, score, team, spectator, players.name ' +
+			'FROM players LEFT JOIN servers ON players.server_id = servers.id;',
+			function(err, rows) {
+				if (err) {
+					throw err;
+				} else {
+					res.send(rows);
+				}
+			}
+		);
 	});
 	webapp.get(prefix + '/servers/:address::port', function(req, res) {
 		var address = req.params.address;
