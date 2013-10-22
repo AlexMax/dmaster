@@ -40,7 +40,7 @@ webapp.get('/', function(req, res) {
 });
 webapp.get('/servers', function(req, res) {
 	db.all(
-		'SELECT address, port, servers.name, map, maxplayers, ' +
+		'SELECT DISTINCT address, port, servers.name, map, maxplayers, ' +
 		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players ' +
 		'FROM servers LEFT JOIN players ON servers.id = players.server_id '+
 		'WHERE servers.updated IS NOT NULL ORDER BY players DESC;',
