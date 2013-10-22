@@ -28,7 +28,7 @@ db.on('open', function() {
 			'updated TEXT, UNIQUE (address, port) ON CONFLICT IGNORE' +
 		');' +
 		'CREATE TABLE players(' +
-			'server_id INT, ping INT, score INT, team INT, spec INT,' +
+			'server_id INT, ping INT, score INT, team INT, spectator INT,' +
 			'name TEXT, FOREIGN KEY(server_id) REFERENCES servers(id)' +
 		');' +
 		'CREATE TABLE pwads(' +

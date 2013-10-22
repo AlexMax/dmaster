@@ -61,9 +61,14 @@ webapp.get('/servers/:address::port', function(req, res) {
 // REST routes v1
 (function(prefix) {
 	webapp.get(prefix + '/servers', function(req, res) {
-		db.all('SELECT * FROM servers WHERE updated IS NOT NULL;', function(err, rows) {
-			res.send(rows);
-		});
+		db.all(
+			'SELECT address, port, maxplayers, maxclients, ' +
+			'password, iwad, map, gametype, name, url, email ' +
+			'FROM servers WHERE updated IS NOT NULL;',
+			function(err, rows) {
+				res.send(rows);
+			}
+		);
 	});
 	webapp.get(prefix + '/players', function(req, res) {
 		db.all(
@@ -83,15 +88,17 @@ webapp.get('/servers/:address::port', function(req, res) {
 		var port = req.params.port;
 
 		db.get(
-			'SELECT * FROM servers AS s ' +
-			'WHERE s.address = ? AND s.port = ?;'
-		, address, port, function(err, row) {
-			if (row) {
-				res.send(row);
-			} else {
-				res.send(404);
+			'SELECT address, port, maxplayers, maxclients, ' +
+			'password, iwad, map, gametype, name, url, email ' +
+			'FROM servers WHERE servers.address = ? AND servers.port = ?;',
+			address, port, function(err, row) {
+				if (row) {
+					res.send(row);
+				} else {
+					res.send(404);
+				}
 			}
-		});
+		);
 	});
 })('/api/v1');
 

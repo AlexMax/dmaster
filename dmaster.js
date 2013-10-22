@@ -155,7 +155,7 @@ socket.on('message', function(msg, rinfo) {
 							var player = serverInfo.players[i];
 							db.run(
 								'INSERT INTO players ' +
-								'(server_id, ping, score, team, spec, name) ' + 
+								'(server_id, ping, score, team, spectator, name) ' +
 								'VALUES (?, ?, ?, ?, ?, ?);',
 								value, player.ping, player.score, player.team, player.spectator, player.name,
 								function(error) {
