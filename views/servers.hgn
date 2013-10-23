@@ -1,4 +1,6 @@
 <h1>Server List</h1>
+<label for="filter">Filter</label>
+<input id="filter" type="search">
 {{#servers.length}}
 <table>
 	<tr>
@@ -10,7 +12,7 @@
 		<th></th>
 	</tr>
 	{{#servers}}
-	<tr>
+	<tr data-name="{{&escaped.name}}">
 		<td>{{name}}</td>
 		<td>{{players}}/{{maxplayers}}</td>
 		<td>{{wads}}</td>

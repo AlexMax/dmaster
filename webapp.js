@@ -15,6 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 var express = require('express');
+var security = require('security');
+
 var db = require('./db.js');
 
 var webapp = express();
@@ -43,11 +45,18 @@ webapp.get('/servers', function(req, res) {
 		'SELECT DISTINCT address, port, servers.name, map, maxplayers, ' +
 		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players ' +
 		'FROM servers LEFT JOIN players ON servers.id = players.server_id '+
-		'WHERE servers.updated IS NOT NULL ORDER BY players DESC;',
+		'WHERE servers.updated IS NOT NULL ORDER BY players DESC, servers.name;',
 		function(err, rows) {
 			if (err) {
 				throw err;
 			} else {
+				// Mustache does not escape HTML attribute data according to
+				// OWASP recommendations, so I do it here.
+				for (var i = 0;i < rows.length;i++) {
+					rows[i].escaped = {
+						name: security.escapeHTMLAttribute(rows[i].name.toLowerCase())
+					};
+				}
 				res.locals = {servers: rows};
 				res.render('servers');
 			}

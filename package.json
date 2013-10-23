@@ -7,6 +7,7 @@
 		"hogan-express": "0.5.0",
 		"printf": "0.1.2",
 		"q": "0.9.7",
+		"security": "1.0.0",
 		"sqlite3": "2.1.17"
 	},
 	"devDependencies" : {
