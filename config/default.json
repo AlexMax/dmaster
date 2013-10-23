@@ -1,5 +1,7 @@
 {
 	"dmaster": {
+		"ga": false,
+		"title": "DoomSpy",
 		"udpPort": 10700,
 		"webPort": 8080
 	},

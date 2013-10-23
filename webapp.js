@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+var config = require('config');
 var express = require('express');
 var security = require('security');
 
@@ -28,7 +29,9 @@ webapp.enable('trust proxy');
 webapp.use(express.logger());
 webapp.use(express.compress());
 webapp.use('/static', express.static('static'));
+webapp.locals.ga = config.dmaster.ga;
 webapp.locals.static = '/static/';
+webapp.locals.title = config.dmaster.title;
 
 // Hogan templates
 webapp.set('view engine', 'hgn');

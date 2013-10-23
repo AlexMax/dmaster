@@ -33,6 +33,16 @@ All default configuration options are located in `config/default.json`.  To
 override any of the defaults, create `config/runtime.json` and re-define any
 configuration entries that you wish.
 
+### dmaster.ga
+
+Your Google Analytics Tracking ID, used for tracking site traffic.  If set to
+`false`, the Google Analytics script will not even show up at the bottom of
+the page.
+
+### dmaster.title
+
+The string that appears in the HTML title tags.
+
 ### dmaster.udpPort
 
 The port that you wish to use to send out master server and server info
