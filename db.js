@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+var q = require('q');
 var sqlite3 = require('sqlite3').verbose();
 
 var db = new sqlite3.Database(':memory:');
@@ -37,5 +38,22 @@ db.on('open', function() {
 		');'
 	);
 });
+db.servers = function() {
+	var defer = q.defer();
+	this.all(
+		'SELECT DISTINCT address, port, servers.name, map, maxplayers, ' +
+		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players ' +
+		'FROM servers LEFT JOIN players ON servers.id = players.server_id '+
+		'WHERE servers.updated IS NOT NULL ORDER BY players DESC, servers.name;',
+		function(err, rows) {
+			if (err) {
+				defer.reject(err);
+			} else {
+				defer.resolve(rows);
+			}
+		}
+	);
+	return defer.promise;
+}
 
 module.exports = db;

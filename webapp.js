@@ -44,27 +44,20 @@ webapp.get('/', function(req, res) {
 	res.redirect(301, '/servers');
 });
 webapp.get('/servers', function(req, res) {
-	db.all(
-		'SELECT DISTINCT address, port, servers.name, map, maxplayers, ' +
-		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players ' +
-		'FROM servers LEFT JOIN players ON servers.id = players.server_id '+
-		'WHERE servers.updated IS NOT NULL ORDER BY players DESC, servers.name;',
-		function(err, rows) {
-			if (err) {
-				throw err;
-			} else {
-				// Mustache does not escape HTML attribute data according to
-				// OWASP recommendations, so I do it here.
-				for (var i = 0;i < rows.length;i++) {
-					rows[i].escaped = {
-						name: security.escapeHTMLAttribute(rows[i].name.toLowerCase())
-					};
-				}
-				res.locals = {servers: rows};
-				res.render('servers');
-			}
+	db.servers()
+	.then(function(rows) {
+		// Mustache does not escape HTML attribute data according to
+		// OWASP recommendations, so I do it here.  In theory, normal
+		// HTML escaping is adequite for double-quoted attributes, but
+		// I feel safer with this.
+		for (var i = 0;i < rows.length;i++) {
+			rows[i].escaped = {
+				name: security.escapeHTMLAttribute(rows[i].name.toLowerCase())
+			};
 		}
-	);
+		res.locals = {servers: rows};
+		res.render('servers');
+	});
 });
 webapp.get('/servers/:address::port', function(req, res) {
 	res.send('server');
@@ -73,14 +66,10 @@ webapp.get('/servers/:address::port', function(req, res) {
 // REST routes v1
 (function(prefix) {
 	webapp.get(prefix + '/servers', function(req, res) {
-		db.all(
-			'SELECT address, port, maxplayers, maxclients, ' +
-			'password, iwad, map, gametype, name, url, email ' +
-			'FROM servers WHERE updated IS NOT NULL;',
-			function(err, rows) {
-				res.send(rows);
-			}
-		);
+		db.servers()
+		.then(function(rows) {
+			res.send(rows);
+		})
 	});
 	webapp.get(prefix + '/players', function(req, res) {
 		db.all(
