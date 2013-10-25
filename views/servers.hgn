@@ -15,7 +15,8 @@
 	<tr data-name="{{&escaped.name}}">
 		<td>{{name}}</td>
 		<td>{{players}}/{{maxplayers}}</td>
-		<td>{{wads}}</td>
+		<td>{{#pwads.length}}{{iwad}}{{/pwads.length}}{{#pwads}}, {{.}}{{/pwads}}
+		{{^pwads}}{{iwad}}{{/pwads}}</td>
 		<td>{{map}}</td>
 		<td>{{address}}:{{port}}</td>
 		<td><a href="zds://{{address}}:{{port}}/st">IDE</a></td>

@@ -26,14 +26,15 @@ db.on('open', function() {
 			'id INTEGER PRIMARY KEY AUTOINCREMENT, address TEXT, port INT,' +
 			'maxplayers INT, maxclients INT, password INT, iwad TEXT,' +
 			'map TEXT, gametype TEXT, name TEXT, url TEXT, email TEXT, ' +
-			'updated TEXT, UNIQUE (address, port) ON CONFLICT IGNORE' +
+			'pwads_json TEXT, updated TEXT, ' +
+			'UNIQUE (address, port) ON CONFLICT IGNORE' +
 		');' +
 		'CREATE TABLE players(' +
 			'server_id INT, ping INT, score INT, team INT, spectator INT,' +
 			'name TEXT, FOREIGN KEY(server_id) REFERENCES servers(id)' +
 		');' +
 		'CREATE TABLE pwads(' +
-			'server_id INT, pwad TEXT,' +
+			'server_id INT, pwad TEXT, position INT, ' +
 			'FOREIGN KEY(server_id) REFERENCES servers(id)' +
 		');'
 	);
@@ -41,14 +42,28 @@ db.on('open', function() {
 db.servers = function() {
 	var defer = q.defer();
 	this.all(
-		'SELECT DISTINCT address, port, servers.name, map, maxplayers, ' +
-		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players ' +
-		'FROM servers LEFT JOIN players ON servers.id = players.server_id '+
-		'WHERE servers.updated IS NOT NULL ORDER BY players DESC, servers.name;',
+		'SELECT DISTINCT address, port, servers.name, ' +
+		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players, ' +
+		'maxplayers, iwad, pwads_json, map ' +
+		'FROM servers ' +
+		'LEFT JOIN players ON servers.id = players.server_id '+
+		'WHERE updated > datetime(\'now\', \'-2 minutes\') ' +
+		'ORDER BY players DESC, servers.name;',
 		function(err, rows) {
 			if (err) {
+				// BUG: This defer never actually fires the fail() state
+				//      of the promise.
 				defer.reject(err);
 			} else {
+				for (var i = 0;i < rows.length;i++) {
+					var pwads_json = rows[i].pwads_json;
+					if (pwads_json) {
+						rows[i].pwads = JSON.parse(pwads_json);
+					} else {
+						rows[i].pwads = [];
+					}
+					delete rows[i].pwads_json;
+				}
 				defer.resolve(rows);
 			}
 		}

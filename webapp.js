@@ -57,7 +57,11 @@ webapp.get('/servers', function(req, res) {
 		}
 		res.locals = {servers: rows};
 		res.render('servers');
-	});
+	})
+	.fail(function(error) {
+		throw error;
+	})
+	.done();
 });
 webapp.get('/servers/:address::port', function(req, res) {
 	res.send('server');

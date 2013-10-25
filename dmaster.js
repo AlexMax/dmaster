@@ -169,6 +169,46 @@ socket.on('message', function(msg, rinfo) {
 				});
 			});
 		}
+
+		if ('pwads' in serverInfo) {
+			serverId.promise.then(function(value) {
+				db.run('DELETE FROM pwads WHERE server_id = ?', value, function(error) {
+					if (error) {
+						throw error;
+					} else {
+						var pwads = [];
+						for (var i = 0;i < serverInfo.pwads.length;i++) {
+							var pwad = serverInfo.pwads[i];
+							db.run(
+								'INSERT INTO pwads (server_id, pwad, position) VALUES (?, ?, ?);',
+								value, pwad, i,
+								function(error) {
+									if (error) {
+										throw (error);
+									}
+								}
+							);
+							pwads.push(pwad);
+						}
+
+						// Keep a JSON-encoded cache in the servers table itself
+						var pwads_json = null;
+						if (pwads.length > 0) {
+							pwads_json = JSON.stringify(pwads);
+						}
+						db.run(
+							'UPDATE servers SET pwads_json=? WHERE id = ?;',
+							pwads_json, value,
+							function(error) {
+								if (error) {
+									throw (error);
+								}
+							}
+						);
+					}
+				});
+			});
+		}
 		break;
 	case zan.SERVER_LAUNCHER_IGNORING:
 		// console.log('server query ignored, please throttle your requests.');
