@@ -3,23 +3,18 @@
 <input id="filter" type="search">
 {{#servers.length}}
 <table>
-	<tr>
-		<th>Name</th>
-		<th>Players</th>
-		<th>WADs</th>
-		<th>Map</th>
-		<th>Address</th>
-		<th></th>
-	</tr>
 	{{#servers}}
 	<tr data-name="{{&escaped.name}}">
 		<td>{{name}}</td>
 		<td>{{players}}/{{maxplayers}}</td>
-		<td>{{#pwads.length}}{{iwad}}{{/pwads.length}}{{#pwads}}, {{.}}{{/pwads}}
-		{{^pwads}}{{iwad}}{{/pwads}}</td>
-		<td>{{map}}</td>
 		<td>{{address}}:{{port}}</td>
 		<td><a href="zds://{{address}}:{{port}}/st">IDE</a></td>
+	</tr>
+	<tr data-name="{{&escaped.name}}">
+		<td colspan="3">
+			{{#pwads.length}}{{iwad}}{{/pwads.length}}{{#pwads}}, {{.}}{{/pwads}}{{^pwads}}{{iwad}}{{/pwads}}
+		</td>
+		<td>{{map}}</td>
 	</tr>
 	{{/servers}}
 </table>

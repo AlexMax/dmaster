@@ -103,11 +103,19 @@ body {
 	background-position:right 16px top 16px;
 }
 
-tr:nth-child(odd) td {
+tr:nth-child(4n-1) td:first-child, tr:nth-child(4n-3) td:first-child {
+	font-weight:bold;
+}
+
+tr:nth-child(4n), tr:nth-child(4n-2) {
+	font-size:80%;
+}
+
+tr:nth-child(4n-2) td, tr:nth-child(4n-3) td {
 	background:white;
 }
 
-tr:nth-child(even) td {
+tr:nth-child(4n) td, tr:nth-child(4n-1) td {
 	background:lightgray;
 }
 
