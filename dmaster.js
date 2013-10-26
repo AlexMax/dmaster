@@ -145,7 +145,7 @@ socket.on('message', function(msg, rinfo) {
 			});
 		}
 
-		if ('players' in serverInfo && serverInfo.players.length > 0) {
+		if ('players' in serverInfo) {
 			serverId.promise.then(function(value) {
 				db.run('DELETE FROM players WHERE server_id = ?', value, function(error) {
 					if (error) {
