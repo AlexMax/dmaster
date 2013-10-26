@@ -39,35 +39,43 @@ db.on('open', function() {
 		');'
 	);
 });
+
+db.promiseAll = function(query) {
+	var defer = q.defer();
+	this.all(query, function(err, rows) {
+		if (err) {
+			defer.reject(err);
+		} else {
+			defer.resolve(rows);
+		}
+	});
+	return defer.promise;
+}
+
 db.servers = function() {
 	var defer = q.defer();
-	this.all(
+	this.promiseAll(
 		'SELECT DISTINCT address, port, servers.name, ' +
 		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players, ' +
 		'maxplayers, iwad, pwads_json, map ' +
 		'FROM servers ' +
 		'LEFT JOIN players ON servers.id = players.server_id '+
 		'WHERE updated > datetime(\'now\', \'-2 minutes\') ' +
-		'ORDER BY players DESC, servers.name;',
-		function(err, rows) {
-			if (err) {
-				// BUG: This defer never actually fires the fail() state
-				//      of the promise.
-				defer.reject(err);
+		'ORDER BY players DESC, servers.name;'
+	).then(function(rows) {
+		for (var i = 0;i < rows.length;i++) {
+			var pwads_json = rows[i].pwads_json;
+			if (pwads_json) {
+				rows[i].pwads = JSON.parse(pwads_json);
 			} else {
-				for (var i = 0;i < rows.length;i++) {
-					var pwads_json = rows[i].pwads_json;
-					if (pwads_json) {
-						rows[i].pwads = JSON.parse(pwads_json);
-					} else {
-						rows[i].pwads = [];
-					}
-					delete rows[i].pwads_json;
-				}
-				defer.resolve(rows);
+				rows[i].pwads = [];
 			}
+			delete rows[i].pwads_json;
 		}
-	);
+		defer.resolve(rows);
+	}).fail(function(err) {
+		defer.reject(err);
+	});
 	return defer.promise;
 }
 

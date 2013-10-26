@@ -17,6 +17,7 @@
 var config = require('config');
 var express = require('express');
 var security = require('security');
+var util = require('util');
 
 var db = require('./db.js');
 
@@ -59,7 +60,8 @@ webapp.get('/servers', function(req, res) {
 		res.render('servers');
 	})
 	.fail(function(error) {
-		throw error;
+		util.log(error);
+		res.send(500);
 	})
 	.done();
 });
@@ -74,6 +76,11 @@ webapp.get('/servers/:address::port', function(req, res) {
 		.then(function(rows) {
 			res.send(rows);
 		})
+		.fail(function(error) {
+			util.log(error);
+			res.send(500, {'code': 500, 'error': 'Internal Server Error'});
+		})
+		.done();
 	});
 	webapp.get(prefix + '/players', function(req, res) {
 		db.all(
