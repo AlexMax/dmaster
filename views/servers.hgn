@@ -4,13 +4,18 @@
 {{#servers.length}}
 <table>
 	{{#servers}}
-	<tr data-name="{{&escaped.name}}">
-		<td>{{name}}</td>
+	<tr data-name="{{&sanitized.name}}">
+		<td>
+			{{#country}}
+			<i class="{{&sanitized.flagclass}}"></i>
+			{{/country}}
+			{{name}}
+		</td>
 		<td>{{players}}/{{maxplayers}}</td>
 		<td>{{address}}:{{port}}</td>
 		<td><a href="zds://{{address}}:{{port}}/st">IDE</a></td>
 	</tr>
-	<tr data-name="{{&escaped.name}}">
+	<tr data-name="{{&sanitized.name}}">
 		<td colspan="3">
 			{{#pwads.length}}{{iwad}}{{/pwads.length}}{{#pwads}}, {{.}}{{/pwads}}{{^pwads}}{{iwad}}{{/pwads}}
 		</td>

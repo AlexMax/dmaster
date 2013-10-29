@@ -80,3 +80,14 @@ full text of the license is included with dmaster.
 
 I am open to alternative licensing arrangements for all or part of the
 codebase.  Simply drop me a line and we can chat.
+
+Other Licenses
+--------------
+
+dmaster uses code and resources from several other sources:
+
+* HTML5 Boilerplate is available under the [MIT license][html5bpl].
+* The BCA Flag Icon Kit is available under the [MIT license][bcafikl].
+
+[html5bpl]: https://github.com/h5bp/html5-boilerplate/blob/master/LICENSE.md
+[bcafikl]: https://github.com/brodkinca/BCA-CSS-Flag-Sprite/blob/master/LICENSE

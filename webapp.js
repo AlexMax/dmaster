@@ -47,14 +47,20 @@ webapp.get('/', function(req, res) {
 webapp.get('/servers', function(req, res) {
 	db.servers()
 	.then(function(rows) {
-		// Mustache does not escape HTML attribute data according to
-		// OWASP recommendations, so I do it here.  In theory, normal
-		// HTML escaping is adequite for double-quoted attributes, but
-		// I feel safer with this.
 		for (var i = 0;i < rows.length;i++) {
-			rows[i].escaped = {
+			// Mustache does not escape HTML attribute data according to
+			// OWASP recommendations, so I do it here.  In theory, normal
+			// HTML escaping is adequite for double-quoted attributes, but
+			// I feel safer with this.
+			rows[i].sanitized = {
 				name: security.escapeHTMLAttribute(rows[i].name.toLowerCase())
 			};
+
+			// Handle the flag classes here.  No escaping here because this is
+			// not userdata.
+			if (rows[i].country) {
+				rows[i].sanitized.flagclass = 'flag-' + rows[i].country.toLowerCase();
+			}
 		}
 		res.locals = {servers: rows};
 		res.render('servers');

@@ -23,10 +23,10 @@ db.on('open', function() {
 	this.exec(
 		'PRAGMA foreign_keys = ON;' +
 		'CREATE TABLE servers(' +
-			'id INTEGER PRIMARY KEY AUTOINCREMENT, address TEXT, port INT,' +
-			'maxplayers INT, maxclients INT, password INT, iwad TEXT,' +
-			'map TEXT, gametype TEXT, name TEXT, url TEXT, email TEXT, ' +
-			'pwads_json TEXT, updated TEXT, ' +
+			'id INTEGER PRIMARY KEY AUTOINCREMENT, address TEXT, port INT, ' +
+			'country TEXT, maxplayers INT, maxclients INT, password INT, ' +
+			'iwad TEXT, map TEXT, gametype TEXT, name TEXT, url TEXT, ' +
+			'email TEXT, pwads_json TEXT, updated TEXT, ' +
 			'UNIQUE (address, port) ON CONFLICT IGNORE' +
 		');' +
 		'CREATE TABLE players(' +
@@ -55,7 +55,7 @@ db.promiseAll = function(query) {
 db.servers = function() {
 	var defer = q.defer();
 	this.promiseAll(
-		'SELECT DISTINCT address, port, servers.name, ' +
+		'SELECT DISTINCT address, port, country, servers.name, ' +
 		'(SELECT COUNT(*) FROM players WHERE players.server_id = servers.id AND spectator = 0) AS players, ' +
 		'maxplayers, iwad, pwads_json, map ' +
 		'FROM servers ' +

@@ -16,6 +16,7 @@
 
 var config = require('config');
 var dgram = require('dgram');
+var geoip = require('geoip-lite');
 var printf = require('printf');
 var q = require('q');
 
@@ -79,13 +80,18 @@ socket.on('message', function(msg, rinfo) {
 	case zan.MSC_BEGINSERVERLISTPART:
 		var serverList = packet.unmarshallServerList(data.slice(4));
 		var servers = serverList.servers;
-		var stmt = 'INSERT INTO servers (address, port) VALUES (?, ?);';
+		var stmt = 'INSERT INTO servers (address, port, country) VALUES (?, ?, ?);';
 
 		for (var i = 0;i < servers.length;i++) {
 			var address = servers[i].address;
+			var country = null;
+			var geo = geoip.lookup(address);
+			if (geo) {
+				country = geo.country;
+			}
 			for (var j = 0;j < servers[i].ports.length;j++) {
 				var port = servers[i].ports[j];
-				db.run(stmt, address, port, function(error) {
+				db.run(stmt, address, port, country, function(error) {
 					if (error) {
 						throw new Error(error);
 					}
