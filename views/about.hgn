@@ -1,0 +1,13 @@
+<div class="pure-u-1">
+	<h2>About</h2>
+	<p>
+		DoomSpy is a site which aims to collect server data for Doom source
+		ports that support Client/Server online play:
+	</p>
+	<ul>
+		<li><a href="http://zandronum.com/">Zandronum</a></li>
+		<li><a href="http://odamex.net/">Odamex</a> (coming soon)</li>
+		<li><a href="http://www.chocolate-doom.org/">Chocolate Doom</a> (coming soon)</li>
+		<li><a href="http://vavoom-engine.com/">Vavoom</a> (coming soon)</li>
+	</ul>
+</div>

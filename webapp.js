@@ -72,8 +72,14 @@ webapp.get('/servers', function(req, res) {
 	})
 	.done();
 });
-webapp.get('/servers/:address::port', function(req, res) {
-	res.send('server');
+webapp.get('/players', function(req, res) {
+	res.render('players', {subtitle: 'Players'});
+});
+webapp.get('/api', function(req, res) {
+	res.render('api', {subtitle: 'API'});
+});
+webapp.get('/about', function(req, res) {
+	res.render('about', {subtitle: 'About'});
 });
 
 // REST routes v1

@@ -1,0 +1,34 @@
+<div class="pure-u-1">
+	<h2>API</h2>
+	<p>
+		DoomSpy has a REST API that you can query if you wish to use server
+		data in an IRC bot, on your own webpage, or through some other means.
+	</p>
+	<p>
+		The REST API is still a work in progress and fields may be added or
+		removed, endpoints added or removed, or the API might end up playing
+		D_RUNNIN over your spreakers instead of returning useful data.  You
+		have been warned.
+	</p>
+	<h3>Servers</h3>
+	<p>
+		<code>http://doomspy.com/api/v1/servers</code>
+	</p>
+	<p>
+		JSON-encoded data about all servers that DoomSpy can see.
+	</p>
+	<h3>Server</h3>
+	<p>
+		<code>http://doomspy.com/api/v1/servers/&lt;address&gt;:&lt;port&gt;</code>
+	</p>
+	<p>
+		JSON-encoded data about a single server with the given address and port.
+	</p>
+	<h3>Players</h3>
+	<p>
+		<code>http://doomspy.com/api/v1/players</code>
+	</p>
+	<p>
+		JSON-encoded data about all players on servers that DoomSpy can see.
+	</p>
+</div>
