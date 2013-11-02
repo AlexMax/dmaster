@@ -39,6 +39,7 @@ webapp.set('view engine', 'hgn');
 webapp.set('layout', 'layout');
 webapp.enable('view cache');
 webapp.engine('hgn', require('hogan-express'));
+webapp.locals.partials = {menu: 'menu'};
 
 // App routes
 webapp.get('/', function(req, res) {
@@ -63,7 +64,7 @@ webapp.get('/servers', function(req, res) {
 			}
 		}
 		res.locals = {servers: rows};
-		res.render('servers');
+		res.render('servers', {subtitle: 'Servers'});
 	})
 	.fail(function(error) {
 		util.log(error);

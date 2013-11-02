@@ -1,6 +1,6 @@
 (function() {
 	function filter(query) {
-		var servers = $('tr[data-name]');
+		var servers = $('div[data-name]');
 
 		if (!query) {
 			servers.show();

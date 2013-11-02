@@ -1,0 +1,17 @@
+body {
+	background-image:url('/static/img/logo64.png');
+	background-repeat:no-repeat;
+	background-position:right 16px top 48px;
+}
+
+.server {
+	margin-bottom:0.5em;
+}
+
+.name {
+	font-weight:bold;
+}
+
+.wads, .map {
+	font-size:.67em;
+}

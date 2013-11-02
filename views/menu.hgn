@@ -1,0 +1,11 @@
+<div class="pure-u-1">
+	<div class="pure-menu pure-menu-open pure-menu-horizontal">
+		<span class="pure-menu-heading">DoomSpy</span>
+		<ul id="menu">
+			<li><a href="/servers">Servers</a></li>
+			<li><a href="/players">Players</a></li>
+			<li><a href="/api">API</a></li>
+			<li><a href="/about">About</a></li>
+		</ul>
+	</div>
+</div>

@@ -14,13 +14,16 @@
 {{/subtitle}}
 <meta name="description" content="DoomSpy is a web-based server browser for Doom.  Supports online-capable Doom source ports such as Zandronum, Odamex, Chocolate Doom and Vavoom.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="{{ static }}css/normalize.css">
-<link rel="stylesheet" href="{{ static }}css/main.css">
+<link rel="stylesheet" href="{{ static }}css/pure-min.css">
 <link rel="stylesheet" href="{{ static }}css/flags.css">
+<link rel="stylesheet" href="{{ static }}css/doomspy.css">
 <script src="{{ static }}js/vendor/modernizr-2.6.2.min.js"></script>
 </head>
 <body>
-{{{ yield }}}
+<div class="pure-g-r">
+	{{> menu}}
+	{{{ yield }}}
+</div>
 <footer>
 	<p>DoomSpy and <a href="https://github.com/AlexMax/dmaster">dmaster</a> are Copyright &copy; 2013  <a href="https://github.com/AlexMax">Alex Mayfield</a>.  All other copyrights and trademarks are the property of their respective owners.  All rights reserved.</small></p>
 	<p>dmaster is free software licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPL)</a> unless noted otherwise.</p>

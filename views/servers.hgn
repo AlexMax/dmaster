@@ -1,31 +1,35 @@
-<h1>Server List</h1>
-<label for="filter">Filter</label>
-<input id="filter" type="search">
-{{#servers.length}}
-<table>
+<div class="pure-u-2-3">
+	<h2>Servers</h2>
+</div>
+<div class="pure-u-1-3">
+	<label for="filter">Filter</label>
+	<input id="filter" type="search">
+</div>
+<div class="pure-u-1">
+	{{#servers.length}}
 	{{#servers}}
-	<tr data-name="{{&sanitized.name}}">
-		<td>
+	<div class="pure-g-r server" data-name="{{&sanitized.name}}">
+		<div class="pure-u-2-3 name">
 			{{#country}}
 			<i class="{{&sanitized.flagclass}}"></i>
 			{{/country}}
 			{{name}}
-		</td>
-		<td>{{players}}/{{maxplayers}}</td>
-		<td>{{address}}:{{port}}</td>
-		<td><a href="zds://{{address}}:{{port}}/st">IDE</a></td>
-	</tr>
-	<tr data-name="{{&sanitized.name}}">
-		<td colspan="3">
+		</div>
+		<div class="pure-u-1-12 players">{{players}}/{{maxplayers}}</div>
+		<div class="pure-u-1-4 address">
+			{{address}}:{{port}}
+			<a href="zds://{{address}}:{{port}}/st">IDE</a>
+		</div>
+		<div class="pure-u-7-8 wads">
 			{{#pwads.length}}{{iwad}}{{/pwads.length}}{{#pwads}}, {{.}}{{/pwads}}{{^pwads}}{{iwad}}{{/pwads}}
-		</td>
-		<td>{{map}}</td>
-	</tr>
+		</div>
+		<div class="pure-u-1-8 map">{{map}}</div>
+	</div>
 	{{/servers}}
-</table>
-{{/servers.length}}
-{{^servers}}
-<p>
-	No servers found.  Please wait a few moments for the server list to populate...
-</p>
-{{/servers}}
+	{{/servers.length}}
+	{{^servers}}
+	<p>
+		No servers found.  Please wait a few moments for the server list to populate...
+	</p>
+	{{/servers}}
+</div>
