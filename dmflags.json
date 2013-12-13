@@ -1,0 +1,568 @@
+[
+	{
+		"port_name": "Zandronum",
+		"port_id": "zan",
+		"port_flags": [
+			{
+				"flags_name": "DMFlags",
+				"flags_variable": "dmflags",
+				"flags": [
+					{
+						"variable": "SV_NoHealth",
+						"description": "Prevents health from spawning on the map (DM Only).",
+						"value": 1
+					},
+					{
+						"variable": "SV_NoItems",
+						"description": "Prevents powerups from spawning on the map (DM Only).",
+						"value": 2
+					},
+					{
+						"variable": "SV_WeaponStay",
+						"description": "Weapons remain after being picked up by a player.",
+						"value": 4
+					},
+					{
+						"variable": "SV_OldFallDamage",
+						"description": "Enables the falling damage used from ZDoom.",
+						"value": 8
+					},
+					{
+						"variable": "SV_FallDamage",
+						"description": "Enables the stronger but less aggressive falling damage used from Hexen.",
+						"value": 16
+					},
+					{
+						"variable": "SV_SameLevel",
+						"description": "Stay on the same map when someone exits (DM Only).",
+						"value": 64
+					},
+					{
+						"variable": "SV_SpawnFarthest",
+						"description": "Spawn players as far as possible from other players (DM Only).",
+						"value": 128
+					},
+					{
+						"variable": "SV_ForceRespawn",
+						"description": "Forces the players that were killed to respawn (DM Only).",
+						"value": 256
+					},
+					{
+						"variable": "SV_NoArmor",
+						"description": "Prevents armor from spawning on the map (DM Only).",
+						"value": 512
+					},
+					{
+						"variable": "SV_NoExit",
+						"description": "Kill anyone that tries to exit from the map (DM Only).",
+						"value": 1024
+					},
+					{
+						"variable": "SV_InfiniteAmmo",
+						"description": "Players have infinite ammo.",
+						"value": 2048
+					},
+					{
+						"variable": "SV_NoMonsters",
+						"description": "Monsters do not spawn on the map.",
+						"value": 4096
+					},
+					{
+						"variable": "SV_MonsterRespawn",
+						"description": "Monsters will respawn sometime after their death.",
+						"value": 8192
+					},
+					{
+						"variable": "SV_ItemRespawn",
+						"description": "Almost all items respawn after being picked up by a player.",
+						"value": 16384
+					},
+					{
+						"variable": "SV_FastMonsters",
+						"description": "Monsters are fast.",
+						"value": 32768
+					},
+					{
+						"variable": "SV_NoJump",
+						"description": "Prevents players from jumping.",
+						"value": 65536
+					},
+					{
+						"variable": "SV_NoFreelook",
+						"description": "Prevents the players from being able to freelook.",
+						"value": 131072
+					},
+					{
+						"variable": "SV_RespawnSuper",
+						"description": "Allows powerful powerups to respawn.",
+						"value": 262144
+					},
+					{
+						"variable": "SV_NoFOV",
+						"description": "Prevents players from modifying their Field of View.",
+						"value": 524288
+					},
+					{
+						"variable": "SV_NoWeaponSpawn",
+						"description": "Prevents multiplayer-only weapons from spawning in a map (Coop only).",
+						"value": 1048576
+					},
+					{
+						"variable": "SV_NoCrouch",
+						"description": "Prevents players from crouching.",
+						"value": 2097152
+					},
+					{
+						"variable": "SV_Coop_LoseInventory",
+						"description": "Players lose all of their inventory when killed (Coop only).",
+						"value": 4194304
+					},
+					{
+						"variable": "SV_Coop_LoseKeys",
+						"description": "Players will lose all of their keys when killed (Coop only).",
+						"value": 8388608
+					},
+					{
+						"variable": "SV_Coop_LoseWeapons",
+						"description": "Players will lose all of their weapons when killed (Coop only).",
+						"value": 16777216
+					},
+					{
+						"variable": "SV_Coop_LoseArmor",
+						"description": "Players will lose all of their armor when killed (Coop only).",
+						"value": 33554432
+					},
+					{
+						"variable": "SV_Coop_LosePowerups",
+						"description": "Players will lose all of their powerups when killed (Coop only).",
+						"value": 67108864
+					},
+					{
+						"variable": "SV_Coop_LoseAmmo",
+						"description": "Players will lose all their ammo when killed (Coop only).",
+						"value": 134217728
+					},
+					{
+						"variable": "SV_Coop_HalveAmmo",
+						"description": "Players lose half of their ammo when killed (Coop only).",
+						"value": 268435456
+					},
+					{
+						"variable": "SV_AllowJump",
+						"description": "Override MAPINFO flags to allow jumping.",
+						"value": 536870912
+					},
+					{
+						"variable": "SV_AllowCrouch",
+						"description": "Override MAPINFO flags to allow crouching.",
+						"value": 1073741824
+					}
+				]
+			},
+			{
+				"flags_name": "DMFlags2",
+				"flags_variable": "dmflags2",
+				"flags": [
+					{
+						"variable": "SV_WeaponDrop",
+						"description": "Players drop their current weapon when killed or fragged.",
+						"value": 2
+					},
+					{
+						"variable": "SV_NoRunes",
+						"description": "Prevents Skulltag runes from spawning on the map.",
+						"value": 4
+					},
+					{
+						"variable": "SV_InstantReturn",
+						"description": "Flags are instantly returned when the carriers were fragged.",
+						"value": 8
+					},
+					{
+						"variable": "SV_NoTeamSwitch",
+						"description": "Players cannot change teams after joining one.",
+						"value": 16
+					},
+					{
+						"variable": "SV_NoTeamSelect",
+						"description": "Players are placed in teams automatically by the server.",
+						"value": 32
+					},
+					{
+						"variable": "SV_DoubleAmmo",
+						"description": "Double amount of ammo that items give you like skill 1 and 5 do.",
+						"value": 64
+					},
+					{
+						"variable": "SV_Degeneration",
+						"description": "Players slowly lose health when above 100%, like in Quake.",
+						"value": 128
+					},
+					{
+						"variable": "SV_BFGFreeAim",
+						"description": "Allows the BFG to be fired vertically.",
+						"value": 256
+					},
+					{
+						"variable": "SV_BarrelRespawn",
+						"description": "Barrels respawn after being blown up (DM Only).",
+						"value": 512
+					},
+					{
+						"variable": "SV_NoRespawnInvul",
+						"description": "Players do not have temporary invulnerability when respawning (DM Only).",
+						"value": 1024
+					},
+					{
+						"variable": "SV_ShotgunStart",
+						"description": "Players will have a shotgun when they spawn (Coop Only).",
+						"value": 2048
+					},
+					{
+						"variable": "SV_SameSpawnSpot",
+						"description": "Players respawn at the same location they were killed at (Coop only).",
+						"value": 4096
+					},
+					{
+						"variable": "SV_KeepTeams",
+						"description": "Keep players on same teams between maps.",
+						"value": 8192
+					},
+					{
+						"variable": "SV_KeepFrags",
+						"description": "Players frags are never reset when advancing to the next map.",
+						"value": 16384
+					},
+					{
+						"variable": "SV_NoRespawn",
+						"description": "Players can not respawn once killed or fragged.",
+						"value": 32768
+					},
+					{
+						"variable": "SV_LoseFrag",
+						"description": "When fragged, the player will lose a frag.",
+						"value": 65536
+					},
+					{
+						"variable": "SV_InfiniteInventory",
+						"description": "Never run out of any inventory item.",
+						"value": 131072
+					},
+					{
+						"variable": "SV_ForceGLDefaults",
+						"description": "Enforce same OpenGL settings on all clients.",
+						"value": 262144
+					},
+					{
+						"variable": "SV_NoRocketJumping",
+						"description": "Prevent players from rocketjumping.",
+						"value": 524288
+					},
+					{
+						"variable": "SV_AwardDamageInsteadKills",
+						"description": "Players will be awarded points from the damage that they do to monsters.",
+						"value": 1048576
+					},
+					{
+						"variable": "SV_ForceAlpha",
+						"description": "Enforce clients showing translucency effects.",
+						"value": 2097152
+					},
+					{
+						"variable": "SV_KillAllMonsters",
+						"description": "All monsters must be killed before advancing into the next map.",
+						"value": 4194304
+					},
+					{
+						"variable": "SV_NoAutomap",
+						"description": "Prevent players from using the automap.",
+						"value": 8388608
+					},
+					{
+						"variable": "SV_NoAutomapAllies",
+						"description": "Prevent players from seeing allies on the automap.",
+						"value": 16777216
+					},
+					{
+						"variable": "SV_DisallowSpying",
+						"description": "Prevent players from spying on other players.",
+						"value": 33554432
+					},
+					{
+						"variable": "SV_Chasecam",
+						"description": "Allow players to use the chasecam.",
+						"value": 67108864
+					},
+					{
+						"variable": "SV_DisallowSuicide",
+						"description": "Prevent players from committing suicide via the console.",
+						"value": 134217728
+					},
+					{
+						"variable": "SV_NoAutoaim",
+						"description": "Prevent players from using autoaim.",
+						"value": 268435456
+					},
+					{
+						"variable": "SV_Coop_SPActorSpawn",
+						"description": "Use single-player item layout in coop.",
+						"value": 536870912
+					}
+				]
+			},
+			{
+				"flags_name": "DMFlags3",
+				"flags_variable": "dmflags3",
+				"flags": [
+					{
+						"variable": "SV_NoIdentifyTarget",
+						"description": "Players can't identify targets by looking at them.",
+						"value": 1
+					},
+					{
+						"variable": "SV_ApplyLMSSpectatorSettings",
+						"description": "Apply rules about LMS spectators to other game modes.",
+						"value": 2
+					},
+					{
+						"variable": "SV_NoCoopInfo",
+						"description": "Disable coop information on the sides of the screen.",
+						"value": 4
+					},
+					{
+						"variable": "SV_NoUnlagged",
+						"description": "Disable unlagged.",
+						"value": 8
+					},
+					{
+						"variable": "SV_UnblockPlayers",
+						"description": "Allow players to run and shoot through each other.",
+						"value": 16
+					},
+					{
+						"variable": "SV_NoMedals",
+						"description": "Disable medals.",
+						"value": 32
+					}
+				]
+			},
+			{
+				"flags_name": "CompatFlags",
+				"flags_variable": "compatflags",
+				"flags": [
+					{
+						"variable": "Compat_ShortTex",
+						"description": "Find shortest textures like Doom.",
+						"value": 1
+					},
+					{
+						"variable": "Compat_Stairs",
+						"description": "Use buggier stair building.",
+						"value": 2
+					},
+					{
+						"variable": "Compat_LimitPain",
+						"description": "Limit pain elementals to 20 lost souls.",
+						"value": 4
+					},
+					{
+						"variable": "Compat_SilentPickUp",
+						"description": "Don't let other players hear item pickups like in Vanilla Doom.",
+						"value": 8
+					},
+					{
+						"variable": "Compat_NoPassOver",
+						"description": "Actors are infinitely tall.  Note that this will break ZDoom THING bridges.",
+						"value": 16
+					},
+					{
+						"variable": "Compat_SoundSlots",
+						"description": "Allow silent BFG trick.",
+						"value": 32
+					},
+					{
+						"variable": "Compat_WallRun",
+						"description": "Enable wallrunning.",
+						"value": 64
+					},
+					{
+						"variable": "Compat_NoTossDrops",
+						"description": "Spawn item drops on the floor.",
+						"value": 128
+					},
+					{
+						"variable": "Compat_UseBlocking",
+						"description": "All special lines can block use lines.",
+						"value": 256
+					},
+					{
+						"variable": "Compat_NoDoorLight",
+						"description": "Disable Boom door light effect.",
+						"value": 512
+					},
+					{
+						"variable": "Compat_RavenScroll",
+						"description": "Raven's scrollers use their original carrying speed.",
+						"value": 1024
+					},
+					{
+						"variable": "Compat_SoundTarget",
+						"description": "Use sector based sound target code.",
+						"value": 2048
+					},
+					{
+						"variable": "Compat_DehHealth",
+						"description": "Limit DeHackEd MaxHealth to health bonus.",
+						"value": 4096
+					},
+					{
+						"variable": "Compat_Trace",
+						"description": "Trace ignores lines with the same sector on both sides.",
+						"value": 8192
+					},
+					{
+						"variable": "Compat_Dropoff",
+						"description": "Monsters cannot move when hanging over a dropoff.",
+						"value": 16384
+					},
+					{
+						"variable": "Compat_BoomScroll",
+						"description": "Scrolling sectors are additive like in Boom.",
+						"value": 32768
+					},
+					{
+						"variable": "Compat_Invisibility",
+						"description": "Monsters will be able to see the player even if the player has a partial invisibility sphere.",
+						"value": 65536
+					},
+					{
+						"variable": "Compat_Limited_AirMovement",
+						"description": "Use ZDoom's limited air movement instead of Skulltag's.",
+						"value": 131072
+					},
+					{
+						"variable": "Compat_PlasmaBump",
+						"description": "Allow plasma bumping.",
+						"value": 262144
+					},
+					{
+						"variable": "Compat_InstantRespawn",
+						"description": "Allow players to instantly respawn by holding +use.",
+						"value": 524288
+					},
+					{
+						"variable": "Compat_DisableTaunts",
+						"description": "Prevent players from taunting.",
+						"value": 1048576
+					},
+					{
+						"variable": "Compat_OriginalSoundCurve",
+						"description": "Use the original Doom sound curve, which causes sounds to fade away at a shorter distance.",
+						"value": 2097152
+					},
+					{
+						"variable": "Compat_OldIntermission",
+						"description": "Use intermission screens/music instead of Skulltag's win/lose intermissions.",
+						"value": 4194304
+					},
+					{
+						"variable": "Compat_DisableStealthMonsters",
+						"description": "Disable stealth monsters.",
+						"value": 8388608
+					},
+					{
+						"variable": "Compat_OldRadiusDmg",
+						"description": "Explosions have infinite height, like in doom2.exe.",
+						"value": 16777216
+					},
+					{
+						"variable": "Compat_NoCrossHair",
+						"description": "Prevent players from using a crosshair.",
+						"value": 33554432
+					},
+					{
+						"variable": "Compat_OldWeaponSwitch",
+						"description": "Players are forced to switch weapons on pickup.",
+						"value": 67108864
+					},
+					{
+						"variable": "Compat_SilentInstantFloors",
+						"description": "Instantly moving floors are not silent.",
+						"value": 134217728
+					},
+					{
+						"variable": "Compat_SectorSounds",
+						"description": "Sector sounds use original method for sound origin.",
+						"value": 268435456
+					},
+					{
+						"variable": "Compat_MissileClip",
+						"description": "Use original Doom heights for clipping against projectiles.",
+						"value": 536870912
+					},
+					{
+						"variable": "Compat_CrossDropoff",
+						"description": "Monsters can't be pushed over dropoffs.",
+						"value": 1073741824
+					}
+				]
+			},
+			{
+				"flags_name": "CompatFlags2",
+				"flags_variable": "compatflags2",
+				"flags": [
+					{
+						"variable": "Compat_NetScriptsAreClientSide",
+						"description": "Uses Skulltag's old behavior when (NET) ACS Scripts are used.",
+						"value": 1
+					},
+					{
+						"variable": "Compat_ClientsSendFullButtonInfo",
+						"description": "Allow GetPlayerInput() to get the full range of button presses.",
+						"value": 2
+					},
+					{
+						"variable": "Compat_NoLand",
+						"description": "Players can't land, which prevents a movement exploit.",
+						"value": 4
+					},
+					{
+						"variable": "Compat_OldRandom",
+						"description": "Use the doom2.exe random number generator, which makes the SSG more powerful.",
+						"value": 8
+					},
+					{
+						"variable": "Compat_NoGravity_Spheres",
+						"description": "Add NOGRAVITY flag to map-spawned spheres.",
+						"value": 16
+					},
+					{
+						"variable": "Compat_Dont_Stop_Player_Scripts_On_Disconnect",
+						"description": "Prevent ACS scripts from terminating on disconnect.",
+						"value": 32
+					},
+					{
+						"variable": "Compat_ExplosionThrust",
+						"description": "Use original horizontal thrusting code.",
+						"value": 64
+					},
+					{
+						"variable": "Compat_BridgeDrops",
+						"description": "Non-solid objects drop through ZDoom bridge THINGS.",
+						"value": 128
+					},
+					{
+						"variable": "Compat_123b33JumpPhysics",
+						"description": "Use ZDoom 1.23b33's jumping physics.",
+						"value": 256
+					},
+					{
+						"variable": "Compat_FullWeaponLower",
+						"description": "Prevent switching weapons in the middle of raising them.",
+						"value": 512
+					}
+				]
+			}
+		]
+	}
+]

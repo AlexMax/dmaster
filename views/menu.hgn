@@ -5,6 +5,7 @@
 			<li><a href="/servers">Servers</a></li>
 			<li><a href="/players">Players</a></li>
 			<li><a href="/api">API</a></li>
+			<li><a href="/dmflags">DMFlags</a></li>
 			<li><a href="/about">About</a></li>
 		</ul>
 	</div>

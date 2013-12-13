@@ -1,0 +1,36 @@
+<div class="pure-u-1">
+	<h2>DMFlag Calculators</h2>
+	<p>
+		There are special settings for some Doom source ports called "DMFlags".
+		They function as a succinct way of combining several boolean settings
+		settings into one variable.  Unfortunately, they are only useful for
+		sharing server configurations with other server operators - they are
+		maddeningly obtuse for those who cannot do bitwise arithmatic in their
+		heads.
+	</p>
+	<p>
+		Hopefully, these calculators can help.  Checking and unchecking the
+		boxes will update the flags number at the top, and entering a flags
+		number by hand will check and uncheck the appropriate boxes depending
+		on if the flag is turned on or off.
+	</p>
+</div>
+{{#dmflags}}
+<div class="pure-u-1">
+	<h3>{{ port_name }}</h3>
+</div>
+{{#port_flags}}
+<div class="pure-u-1-3">
+	<h4>{{ flags_name }}</h4>
+	<form class="pure-form pure-form-stacked">
+		<input type="text" class="flags_numeric" data-for="{{ port_id }}_{{ flags_variable }}" id="{{ port_id }}_{{ flags_variable }}_numeric" value="0">
+		{{#flags}}
+		<label for="{{ port_id }}_{{ flags_variable }}_{{ value }}_check" data-value="{{ value }}">
+			<input class="flag_check" data-for="{{ port_id }}_{{ flags_variable }}" id="{{ port_id }}_{{ flags_variable }}_{{ value }}_check" type="checkbox"> {{ variable }}
+			<a href="#" class="flag_help" data-description="{{ description }}">?</a>
+		</label>
+		{{/flags}}
+	</form>
+</div>
+{{/port_flags}}
+{{/dmflags}}

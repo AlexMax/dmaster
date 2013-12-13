@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 var config = require('config');
+var fs = require('fs');
 var express = require('express');
 var security = require('security');
 var util = require('util');
@@ -77,6 +78,10 @@ webapp.get('/players', function(req, res) {
 });
 webapp.get('/api', function(req, res) {
 	res.render('api', {subtitle: 'API'});
+});
+webapp.get('/dmflags', function(req, res) {
+	var dmflags = JSON.parse(fs.readFileSync('dmflags.json', 'utf8'));
+	res.render('dmflags', {subtitle: 'DMFlags', dmflags: dmflags});
 });
 webapp.get('/about', function(req, res) {
 	res.render('about', {subtitle: 'About'});
