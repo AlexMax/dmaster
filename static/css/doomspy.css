@@ -4,6 +4,10 @@ body {
 	background-position:right 16px top 48px;
 }
 
+.content {
+	padding:0 2em;
+}
+
 .server {
 	margin-bottom:0.5em;
 }

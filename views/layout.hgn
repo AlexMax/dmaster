@@ -22,7 +22,9 @@
 <body>
 <div class="pure-g-r">
 	{{> menu}}
-	{{{ yield }}}
+	<div class="content">
+		{{{ yield }}}
+	</div>
 </div>
 <footer>
 	<p>DoomSpy and <a href="https://github.com/AlexMax/dmaster">dmaster</a> are Copyright &copy; 2013  <a href="https://github.com/AlexMax">Alex Mayfield</a>.  All other copyrights and trademarks are the property of their respective owners.  All rights reserved.</small></p>
