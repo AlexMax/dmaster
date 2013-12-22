@@ -42,7 +42,7 @@ function send_query(socket) {
 	db.each('SELECT id, address, port FROM servers;', function(err, row) {
 		socket.send(challenge, 0, challenge.length, row.port, row.address, function(error, length) {
 			if (error) {
-				console.log('server query error: ' + error + '.');
+				console.error('server query error: ' + error + '.');
 			}
 		});
 	});
@@ -56,7 +56,7 @@ function send_challenge(socket) {
 		(function(i) {
 			socket.send(challenge, 0, challenge.length, masters[i].port, masters[i].address, function(error, length) {
 				if (error) {
-					console.log('mater challenge error: ' + error + '.');
+					console.error('master challenge error: ' + error + '.');
 				}
 			});
 		})(i);
@@ -64,166 +64,170 @@ function send_challenge(socket) {
 }
 
 socket.on('message', function(msg, rinfo) {
-	var data = huf.decode(msg);
-	var flag = data.readUInt32LE(0);
+	try {
+		var data = huf.decode(msg);
+		var flag = data.readUInt32LE(0);
 
-	switch (flag) {
-	case zan.MSC_IPISBANNED:
-		console.log('master query ignored, banned from the master server.');
-		break;
-	case zan.MSC_REQUESTIGNORED:
-		// console.log('master query ignored, please throttle your requests.');
-		break;
-	case zan.MSC_WRONGVERSION:
-		console.log('master query ignored, protocol version out of date.');
-		break;
-	case zan.MSC_BEGINSERVERLISTPART:
-		var serverList = packet.unmarshallServerList(data.slice(4));
-		var servers = serverList.servers;
-		var stmt = 'INSERT INTO servers (address, port, country) VALUES (?, ?, ?);';
+		switch (flag) {
+		case zan.MSC_IPISBANNED:
+			throw new Error('master query ignored, banned from the master server.');
+			break;
+		case zan.MSC_REQUESTIGNORED:
+			// console.error('master query ignored, please throttle your requests.');
+			break;
+		case zan.MSC_WRONGVERSION:
+			throw new Error('master query ignored, protocol version out of date.');
+			break;
+		case zan.MSC_BEGINSERVERLISTPART:
+			var serverList = packet.unmarshallServerList(data.slice(4));
+			var servers = serverList.servers;
+			var stmt = 'INSERT INTO servers (address, port, country) VALUES (?, ?, ?);';
 
-		for (var i = 0;i < servers.length;i++) {
-			var address = servers[i].address;
-			var country = null;
-			var geo = geoip.lookup(address);
-			if (geo) {
-				country = geo.country;
-			}
-			for (var j = 0;j < servers[i].ports.length;j++) {
-				var port = servers[i].ports[j];
-				db.run(stmt, address, port, country, function(error) {
-					if (error) {
-						throw new Error(error);
-					}
-				});
-			}
-		}
-		break;
-	case zan.SERVER_LAUNCHER_CHALLENGE:
-		// Look up the id associated with the given address and port.  Stores
-		// the value in a promise so we can unmarshall packets while we wait
-		// on the id to be returned.
-		var serverId = q.defer();
-		db.get(
-			'SELECT id FROM servers WHERE address = ? AND port = ?;',
-			rinfo.address, rinfo.port,
-			function(err, row) {
-				if (err) {
-					serverId.reject(err);
-				} else if (!('id' in row)) {
-					serverId.reject(rinfo.address + ':' + rinfo.port + ' was not found in the server database.');
-				} else {
-					serverId.resolve(row.id);
+			for (var i = 0;i < servers.length;i++) {
+				var address = servers[i].address;
+				var country = null;
+				var geo = geoip.lookup(address);
+				if (geo) {
+					country = geo.country;
+				}
+				for (var j = 0;j < servers[i].ports.length;j++) {
+					var port = servers[i].ports[j];
+					db.run(stmt, address, port, country, function(error) {
+						if (error) {
+							throw new Error(error);
+						}
+					});
 				}
 			}
-		);
+			break;
+		case zan.SERVER_LAUNCHER_CHALLENGE:
+			// Look up the id associated with the given address and port.  Stores
+			// the value in a promise so we can unmarshall packets while we wait
+			// on the id to be returned.
+			var serverId = q.defer();
+			db.get(
+				'SELECT id FROM servers WHERE address = ? AND port = ?;',
+				rinfo.address, rinfo.port,
+				function(err, row) {
+					if (err) {
+						serverId.reject(err);
+					} else if (!('id' in row)) {
+						serverId.reject(rinfo.address + ':' + rinfo.port + ' was not found in the server database.');
+					} else {
+						serverId.resolve(row.id);
+					}
+				}
+			);
 
-		var serverInfo = packet.unmarshallServerInfo(data.slice(4));
+			var serverInfo = packet.unmarshallServerInfo(data.slice(4));
 
-		// Update basic server information.
-		const validServerColumns = [
-			'name', 'url', 'email', 'map', 'maxclients', 'maxplayers',
-			'gametype', 'iwad', 'password'
-		];
-		var sets = [];
-		var params = [];
+			// Update basic server information.
+			const validServerColumns = [
+				'name', 'url', 'email', 'map', 'maxclients', 'maxplayers',
+				'gametype', 'iwad', 'password'
+			];
+			var sets = [];
+			var params = [];
 
-		for (var i = 0;i < validServerColumns.length;i++) {
-			if (validServerColumns[i] in serverInfo) {
-				sets.push(validServerColumns[i] + '=?');
-				params.push(serverInfo[validServerColumns[i]]);
+			for (var i = 0;i < validServerColumns.length;i++) {
+				if (validServerColumns[i] in serverInfo) {
+					sets.push(validServerColumns[i] + '=?');
+					params.push(serverInfo[validServerColumns[i]]);
+				}
 			}
-		}
 
-		if (params.length > 0) {
-			serverId.promise.then(function(value) {
-				params.push(value);
-				var stmt =
-					'UPDATE servers SET ' + sets.join(',') +
-					',updated=datetime(\'now\') WHERE id = ?';
-				db.run(stmt, params, function(error) {
-					if (error) {
-						throw new Error(error);
-					}
+			if (params.length > 0) {
+				serverId.promise.then(function(value) {
+					params.push(value);
+					var stmt =
+						'UPDATE servers SET ' + sets.join(',') +
+						',updated=datetime(\'now\') WHERE id = ?';
+					db.run(stmt, params, function(error) {
+						if (error) {
+							throw new Error(error);
+						}
+					});
+				}, function(reason) {
+					console.error(reason);
 				});
-			}, function(reason) {
-				console.log(reason);
-			});
-		}
+			}
 
-		if ('players' in serverInfo) {
-			serverId.promise.then(function(value) {
-				db.run('DELETE FROM players WHERE server_id = ?', value, function(error) {
-					if (error) {
-						throw error;
-					} else {
-						for (var i = 0;i < serverInfo.players.length;i++) {
-							var player = serverInfo.players[i];
-							db.run(
-								'INSERT INTO players ' +
-								'(server_id, ping, score, team, spectator, name) ' +
-								'VALUES (?, ?, ?, ?, ?, ?);',
-								value, player.ping, player.score, player.team, player.spectator, player.name,
-								function(error) {
-									if (error) {
-										throw (error);
+			if ('players' in serverInfo) {
+				serverId.promise.then(function(value) {
+					db.run('DELETE FROM players WHERE server_id = ?', value, function(error) {
+						if (error) {
+							throw error;
+						} else {
+							for (var i = 0;i < serverInfo.players.length;i++) {
+								var player = serverInfo.players[i];
+								db.run(
+									'INSERT INTO players ' +
+									'(server_id, ping, score, team, spectator, name) ' +
+									'VALUES (?, ?, ?, ?, ?, ?);',
+									value, player.ping, player.score, player.team, player.spectator, player.name,
+									function(error) {
+										if (error) {
+											throw (error);
+										}
 									}
-								}
-							);
-						}
-					}
-				});
-			});
-		}
-
-		if ('pwads' in serverInfo) {
-			serverId.promise.then(function(value) {
-				db.run('DELETE FROM pwads WHERE server_id = ?', value, function(error) {
-					if (error) {
-						throw error;
-					} else {
-						var pwads = [];
-						for (var i = 0;i < serverInfo.pwads.length;i++) {
-							var pwad = serverInfo.pwads[i];
-							db.run(
-								'INSERT INTO pwads (server_id, pwad, position) VALUES (?, ?, ?);',
-								value, pwad, i,
-								function(error) {
-									if (error) {
-										throw (error);
-									}
-								}
-							);
-							pwads.push(pwad);
-						}
-
-						// Keep a JSON-encoded cache in the servers table itself
-						var pwads_json = null;
-						if (pwads.length > 0) {
-							pwads_json = JSON.stringify(pwads);
-						}
-						db.run(
-							'UPDATE servers SET pwads_json=? WHERE id = ?;',
-							pwads_json, value,
-							function(error) {
-								if (error) {
-									throw (error);
-								}
+								);
 							}
-						);
-					}
+						}
+					});
 				});
-			});
+			}
+
+			if ('pwads' in serverInfo) {
+				serverId.promise.then(function(value) {
+					db.run('DELETE FROM pwads WHERE server_id = ?', value, function(error) {
+						if (error) {
+							throw error;
+						} else {
+							var pwads = [];
+							for (var i = 0;i < serverInfo.pwads.length;i++) {
+								var pwad = serverInfo.pwads[i];
+								db.run(
+									'INSERT INTO pwads (server_id, pwad, position) VALUES (?, ?, ?);',
+									value, pwad, i,
+									function(error) {
+										if (error) {
+											throw (error);
+										}
+									}
+								);
+								pwads.push(pwad);
+							}
+
+							// Keep a JSON-encoded cache in the servers table itself
+							var pwads_json = null;
+							if (pwads.length > 0) {
+								pwads_json = JSON.stringify(pwads);
+							}
+							db.run(
+								'UPDATE servers SET pwads_json=? WHERE id = ?;',
+								pwads_json, value,
+								function(error) {
+									if (error) {
+										throw (error);
+									}
+								}
+							);
+						}
+					});
+				});
+			}
+			break;
+		case zan.SERVER_LAUNCHER_IGNORING:
+			throw new Error('server query ignored, please throttle your requests.');
+			break;
+		case zan.SERVER_LAUNCHER_BANNED:
+			throw new Error('server query ignored, banned from the server.');
+			break;
+		default:
+			throw new Error('unrecognized response ' + flag + '.');
 		}
-		break;
-	case zan.SERVER_LAUNCHER_IGNORING:
-		// console.log('server query ignored, please throttle your requests.');
-		break;
-	case zan.SERVER_LAUNCHER_BANNED:
-		console.log('server query ignored, banned from the server.');
-		break;
-	default:
-		throw new Error('unrecognized response ' + flag + '.');
+	} catch (e) {
+		console.error(rinfo.address + ':' + rinfo.port + ' - ' + e.message);
 	}
 });
 
