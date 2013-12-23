@@ -1,0 +1,74 @@
+<div class="pure-u-1">
+	<h2>Server</h2>
+</div>
+<div class="pure-u-1">
+	<div class="pure-g-r server" data-name="{{name}}">
+		<div class="pure-u-2-3 name">
+			{{#server.country}}
+			<i class="{{server.flagclass}}"></i>
+			{{/server.country}}
+			{{server.name}}
+		</div>
+		<div class="pure-u-1-12 players">{{server.players}}/{{server.maxplayers}}</div>
+		<div class="pure-u-1-4 address">
+			{{server.address}}:{{server.port}}
+			<a href="zds://{{address}}:{{port}}/st">IDE</a>
+		</div>
+	</div>
+</div>
+<div class="pure-u-1-3">
+	<h3>WAD Files</h3>
+	<ul>
+		{{#server.iwad_url}}<li><a target="_blank" href="{{server.iwad_url}}">{{server.iwad}}</a></li>{{/server.iwad_url}}
+		{{^server.iwad_url}}<li>{{server.iwad}}</li>{{/server.iwad_url}}
+		{{#server.pwads}}
+		<li>{{.}}</li>
+		{{/server.pwads}}
+	</ul>
+	<h3>Map</h3>
+	{{server.map}}
+</div>
+<div class="pure-u-1-3">
+	<h3>Settings</h3>
+	<p>Coming soon...</p>
+</div>
+<div class="pure-u-1-3">
+	{{#players.length}}
+	<h3>Players</h3>
+	<table>
+		<tr>
+			<th>Score</th>
+			{{#teamgame}}<th>Team</th>{{/teamgame}}
+			<th>Name</th>
+			<th>Ping</th>
+		</tr>
+		{{#players}}
+		<tr>
+			<td>{{score}}</td>
+			{{#teamgame}}<td>{{team}}</td>{{/teamgame}}
+			<td>{{nicename}}</td>
+			<td>{{ping}}</td>
+		</tr>
+		{{/players}}
+	</table>
+	{{/players.length}}
+	{{^players.length}}
+	<h3>Players</h3>
+	<p>No players</p>
+	{{/players.length}}
+	{{#spectators.length}}
+	<h3>Spectators</h3>
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Ping</th>
+		</tr>
+		{{#spectators}}
+		<tr>
+			<td>{{nicename}}</td>
+			<td>{{ping}}</td>
+		</tr>
+		{{/spectators}}
+	</table>
+	{{/spectators.length}}
+</div>

@@ -218,7 +218,7 @@ socket.on('message', function(msg, rinfo) {
 			}
 			break;
 		case zan.SERVER_LAUNCHER_IGNORING:
-			throw new Error('server query ignored, please throttle your requests.');
+			// throw new Error('server query ignored, please throttle your requests.');
 			break;
 		case zan.SERVER_LAUNCHER_BANNED:
 			throw new Error('server query ignored, banned from the server.');

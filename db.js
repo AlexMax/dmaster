@@ -40,9 +40,21 @@ db.on('open', function() {
 	);
 });
 
-db.promiseAll = function(query) {
+db.promiseGet = function(query, params) {
 	var defer = q.defer();
-	this.all(query, function(err, rows) {
+	this.get(query, params, function(err, row) {
+		if (err) {
+			defer.reject(err);
+		} else {
+			defer.resolve(row);
+		}
+	});
+	return defer.promise;
+};
+
+db.promiseAll = function(query, params) {
+	var defer = q.defer();
+	this.all(query, params, function(err, rows) {
 		if (err) {
 			defer.reject(err);
 		} else {
@@ -50,7 +62,58 @@ db.promiseAll = function(query) {
 		}
 	});
 	return defer.promise;
-}
+};
+
+db.server = function(address, port) {
+	var defer = q.defer();
+	this.promiseGet(
+		'SELECT DISTINCT address, port, country, servers.name, ' +
+		'maxplayers, iwad, pwads_json, map ' +
+		'FROM servers '+
+		'WHERE updated > datetime(\'now\', \'-2 minutes\') ' +
+		'AND servers.address = ? AND servers.port = ?;',
+		[address, port]
+	).then(function(row) {
+		if (row !== undefined) {
+			if ('pwads_json' in row) {
+				row.pwads = JSON.parse(row.pwads_json);
+			} else {
+				row.pwads = [];
+			}
+			delete row.pwads_json;
+		}
+		defer.resolve(row);
+	}).fail(function(err) {
+		defer.reject(err);
+	});
+	return defer.promise;
+};
+
+db.serverPlayers = function(address, port) {
+	var defer = q.defer();
+	this.promiseAll(
+		'SELECT ping, score, team, spectator, players.name ' +
+		'FROM players ' +
+		'LEFT JOIN servers ON players.server_id = servers.id '+
+		'WHERE updated > datetime(\'now\', \'-2 minutes\') ' +
+		'AND servers.address = ? AND servers.port = ? ' +
+		'ORDER BY spectator DESC, team, score DESC, players.name;',
+		[address, port]
+	).then(function(rows) {
+		for (var i = 0;i < rows.length;i++) {
+			if (rows[i].spectator) {
+				rows[i].spectator = true;
+			} else {
+				rows[i].spectator = false;
+			}
+			rows[i].nicename = rows[i].name.replace(/\u001c([A-Za-z*!+-]|\[.+\])/g, '');
+		}
+		defer.resolve(rows);
+	}).fail(function(err) {
+		defer.reject(err);
+	});
+	return defer.promise;
+};
 
 db.servers = function() {
 	var defer = q.defer();
@@ -77,6 +140,6 @@ db.servers = function() {
 		defer.reject(err);
 	});
 	return defer.promise;
-}
+};
 
 module.exports = db;

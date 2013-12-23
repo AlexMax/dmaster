@@ -4,6 +4,10 @@ body {
 	background-position:right 16px top 48px;
 }
 
+a {
+	text-decoration:none;
+}
+
 .content {
 	padding:0 2em;
 }

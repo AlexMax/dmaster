@@ -17,7 +17,7 @@
 var config = require('config');
 var fs = require('fs');
 var express = require('express');
-var security = require('security');
+var q = require('q');
 var util = require('util');
 
 var db = require('./db.js');
@@ -50,23 +50,87 @@ webapp.get('/servers', function(req, res) {
 	db.servers()
 	.then(function(rows) {
 		for (var i = 0;i < rows.length;i++) {
-			// Mustache does not escape HTML attribute data according to
-			// OWASP recommendations, so I do it here.  In theory, normal
-			// HTML escaping is adequite for double-quoted attributes, but
-			// I feel safer with this.
-			rows[i].sanitized = {
-				name: security.escapeHTMLAttribute(rows[i].name.toLowerCase())
-			};
-
-			// Handle the flag classes here.  No escaping here because this is
-			// not userdata.
+			// Country flags
 			if (rows[i].country) {
-				rows[i].sanitized.flagclass = 'flag-' + rows[i].country.toLowerCase();
+				rows[i].flagclass = 'flag-' + rows[i].country.toLowerCase();
 			}
 		}
 		res.locals = {servers: rows};
 		res.render('servers', {subtitle: 'Servers'});
 	})
+	.fail(function(error) {
+		util.log(error);
+		res.send(500);
+	})
+	.done();
+});
+webapp.get('/servers/:address::port', function(req, res) {
+	var address = req.params.address;
+	var port = req.params.port;
+
+	q.spread(
+		[db.server(address, port), db.serverPlayers(address, port)],
+		function (server, players) {
+			// If server doesn't exist, 404 the page.
+			if (server === undefined) {
+				res.send(404);
+				return;
+			}
+
+			// Country flags
+			if (server.country) {
+				server.flagclass = 'flag-' + server.country.toLowerCase();
+			}
+
+			// Correct URLs to obtain IWADs.
+			var iwad = server.iwad.toLowerCase();
+			if (iwad === 'doom1.wad' || iwad === 'heretic1.wad' || iwad === 'strife0.wad') {
+				server.iwad_url = 'http://www.doomworld.com/classicdoom/info/shareware.php';
+			} else if (iwad === 'doom.wad') {
+				server.iwad_url = 'http://store.steampowered.com/app/2280/';
+			} else if (iwad === 'doom2.wad') {
+				server.iwad_url = 'http://store.steampowered.com/app/2300/';
+			} else if (iwad === 'plutonia.wad' || iwad === 'tnt.wad') {
+				server.iwad_url = 'http://store.steampowered.com/app/2290/';
+			} else if (iwad === 'heretic.wad') {
+				server.iwad_url = 'http://store.steampowered.com/app/2390/';
+			} else if (iwad === 'hexen.wad') {
+				server.iwad_url = 'http://store.steampowered.com/app/2360/';
+			} else if (iwad === 'hexdd.wad') {
+				server.iwad_url = 'http://store.steampowered.com/app/2370/';
+			} else if (iwad === 'chex3.wad') {
+				server.iwad_url = 'http://www.chucktropolis.com/gamers.htm';
+			} else if (iwad === 'megagame.wad') {
+				server.iwad_url = 'http://cutstuff.net/mm8bdm/';
+			}
+
+			server.players = 0;
+			teamgame = false;
+			spectators = [];
+			for (var i = 0;i < players.length;i++) {
+				if (players[i].team !== null) {
+					teamgame = true;
+				}
+
+				if (players[i].spectator === false) {
+					delete players[i].spectator;
+					server.players += 1;
+				} else {
+					delete players[i].spectator;
+					spectators.push(players[i]);
+					delete players[i];
+				}
+			}
+
+			res.locals = {
+				server: server,
+				players: players,
+				spectators: spectators,
+				teamgame: teamgame
+			};
+			res.render('server', {subtitle: 'Server'});
+		}
+	)
 	.fail(function(error) {
 		util.log(error);
 		res.send(500);
@@ -100,6 +164,17 @@ webapp.get('/about', function(req, res) {
 		})
 		.done();
 	});
+	webapp.get(prefix + '/servers/:address::port', function(req, res) {
+		db.server(req.params.address, req.params.port)
+		.then(function(row) {
+			res.send(row);
+		})
+		.fail(function(error) {
+			util.log(error);
+			res.send(500, {'code': 500, 'error': 'Internal Server Error'});
+		})
+		.done();
+	});
 	webapp.get(prefix + '/players', function(req, res) {
 		db.all(
 			'SELECT address, port, ping, score, team, spectator, players.name ' +
@@ -109,23 +184,6 @@ webapp.get('/about', function(req, res) {
 					throw err;
 				} else {
 					res.send(rows);
-				}
-			}
-		);
-	});
-	webapp.get(prefix + '/servers/:address::port', function(req, res) {
-		var address = req.params.address;
-		var port = req.params.port;
-
-		db.get(
-			'SELECT address, port, maxplayers, maxclients, ' +
-			'password, iwad, map, gametype, name, url, email ' +
-			'FROM servers WHERE servers.address = ? AND servers.port = ?;',
-			address, port, function(err, row) {
-				if (row) {
-					res.send(row);
-				} else {
-					res.send(404);
 				}
 			}
 		);
