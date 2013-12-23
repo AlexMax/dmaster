@@ -22,7 +22,7 @@
 		{{#server.iwad_url}}<li><a target="_blank" href="{{server.iwad_url}}">{{server.iwad}}</a></li>{{/server.iwad_url}}
 		{{^server.iwad_url}}<li>{{server.iwad}}</li>{{/server.iwad_url}}
 		{{#server.pwads}}
-		<li>{{.}}</li>
+		<li><a target="_blank" href="http://www.wad-archive.com/wad/{{.}}">{{.}}</a></li>
 		{{/server.pwads}}
 	</ul>
 	<h3>Map</h3>
