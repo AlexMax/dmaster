@@ -50,6 +50,9 @@ webapp.get('/servers', function(req, res) {
 	db.servers()
 	.then(function(rows) {
 		for (var i = 0;i < rows.length;i++) {
+			// Sanitized data-name
+			rows[i].dataname = rows[i].name.toLowerCase();
+
 			// Country flags
 			if (rows[i].country) {
 				rows[i].flagclass = 'flag-' + rows[i].country.toLowerCase();

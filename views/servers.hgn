@@ -8,7 +8,7 @@
 <div class="pure-u-1">
 	{{#servers.length}}
 	{{#servers}}
-	<div class="pure-g-r server" data-name="{{name}}">
+	<div class="pure-g-r server" data-name="{{dataname}}">
 		<div class="pure-u-2-3 name">
 			<a href="/servers/{{address}}:{{port}}">
 				{{#country}}
