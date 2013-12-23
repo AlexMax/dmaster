@@ -168,10 +168,23 @@ webapp.get('/about', function(req, res) {
 		.done();
 	});
 	webapp.get(prefix + '/servers/:address::port', function(req, res) {
-		db.server(req.params.address, req.params.port)
-		.then(function(row) {
-			res.send(row);
-		})
+		var address = req.params.address;
+		var port = req.params.port;
+
+		q.spread(
+			[db.server(address, port), db.serverPlayers(address, port)],
+			function (server, players) {
+				// If server doesn't exist, 404 the page.
+				if (server === undefined) {
+					res.send(404, {'code': 404, 'error': 'Not Found'});
+					return;
+				}
+
+				// Send back players as part of the server response.
+				server.players = players;
+				res.send(server);
+			}
+		)
 		.fail(function(error) {
 			util.log(error);
 			res.send(500, {'code': 500, 'error': 'Internal Server Error'});
