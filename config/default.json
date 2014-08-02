@@ -8,7 +8,7 @@
 	"masters": [
 		{
 			"type": "zandronum",
-			"address": "master.zandronum.com",
+			"address": "66.228.33.44",
 			"port": 15300,
 			"timeout": 15
 		}

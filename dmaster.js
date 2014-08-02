@@ -238,7 +238,7 @@ socket.on('listening', function() {
 	send_challenge(this);
 
 	setInterval(send_challenge, 30000, this);
-	setInterval(send_query, 5000, this);
+	setInterval(send_query, 15000, this);
 });
 
 socket.bind(config.dmaster.udpPort);

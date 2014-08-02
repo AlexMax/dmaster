@@ -131,7 +131,7 @@ webapp.get('/servers/:address::port', function(req, res) {
 				spectators: spectators,
 				teamgame: teamgame
 			};
-			res.render('server', {subtitle: 'Server'});
+			res.render('server', {subtitle: server.name});
 		}
 	)
 	.fail(function(error) {

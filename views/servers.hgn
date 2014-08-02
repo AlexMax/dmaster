@@ -20,7 +20,7 @@
 		<div class="pure-u-1-12 players">{{players}}/{{maxplayers}}</div>
 		<div class="pure-u-1-4 address">
 			{{address}}:{{port}}
-			<a href="zds://{{address}}:{{port}}/st">IDE</a>
+			<a href="zds://{{address}}:{{port}}/za">Connect</a>
 		</div>
 		<div class="pure-u-7-8 wads">
 			{{#pwads.length}}{{iwad}}{{/pwads.length}}{{#pwads}}, {{.}}{{/pwads}}{{^pwads}}{{iwad}}{{/pwads}}
