@@ -73,7 +73,7 @@ socket.on('message', function(msg, rinfo) {
 			throw new Error('master query ignored, banned from the master server.');
 			break;
 		case zan.MSC_REQUESTIGNORED:
-			// console.error('master query ignored, please throttle your requests.');
+			throw new Error('master query ignored, please throttle your requests.');
 			break;
 		case zan.MSC_WRONGVERSION:
 			throw new Error('master query ignored, protocol version out of date.');
@@ -218,7 +218,7 @@ socket.on('message', function(msg, rinfo) {
 			}
 			break;
 		case zan.SERVER_LAUNCHER_IGNORING:
-			// throw new Error('server query ignored, please throttle your requests.');
+			throw new Error('server query ignored, please throttle your requests.');
 			break;
 		case zan.SERVER_LAUNCHER_BANNED:
 			throw new Error('server query ignored, banned from the server.');
