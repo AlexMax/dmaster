@@ -84,10 +84,15 @@ codebase.  Simply drop me a line and we can chat.
 Other Licenses
 --------------
 
-dmaster uses code and resources from several other sources:
+All licenses for serverside packages are included in their respective
+directories upon installation.
+
+In addition, dmaster uses code and resources from several other sources:
 
 * HTML5 Boilerplate is available under the [MIT license][html5bpl].
+* Pure is available under the [BSD license][purecss].
 * The BCA Flag Icon Kit is available under the [MIT license][bcafikl].
 
 [html5bpl]: https://github.com/h5bp/html5-boilerplate/blob/master/LICENSE.md
+[purecss]: https://github.com/yui/pure/blob/master/LICENSE.md
 [bcafikl]: https://github.com/brodkinca/BCA-CSS-Flag-Sprite/blob/master/LICENSE
